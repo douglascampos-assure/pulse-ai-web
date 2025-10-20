@@ -29,7 +29,9 @@ export default function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <div className="min-w-screen min-h-screen flex flex-col flex-grow">
+            {children}
+          </div>
         </ThemeProvider>
       </body>
     </html>

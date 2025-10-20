@@ -1,3 +1,5 @@
-export default function SignUnRoute() {
-    return <div>Sing Un Route</div>
+import { SignupForm } from "@/src/components/forms/SignupForm"
+
+export default function SignUpRoute() {
+    return <SignupForm />
 }

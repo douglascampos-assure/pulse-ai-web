@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { signupUserAction } from "@/src/data/actions/auth-actions";
 
 import {
   CardTitle,
@@ -23,11 +24,7 @@ const INITIAL_STATE = {
 };
 
 export function SignupForm() {
-  const [formState, formAction] = useActionState(
-    INITIAL_STATE
-  );
-
-  console.log(formState, "client");
+  const [formState, formAction] = useActionState(signupUserAction, INITIAL_STATE);
 
   return (
     <div className="w-full max-w-md">
