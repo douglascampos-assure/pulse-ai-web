@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 
+import { useAuth } from "@/src/context/AuthContext"
 import { useIsMobile } from "@/src/hooks/use-mobile"
 import {
   NavigationMenu,
@@ -54,6 +55,7 @@ const components = [
 ]
 
 export function NavBar() {
+  const { user, logout } = useAuth()
   const isMobile = useIsMobile()
 
   return (
@@ -166,6 +168,40 @@ export function NavBar() {
         <NavigationMenuItem>
           <ModeToggle />
         </NavigationMenuItem>
+        {user ? (
+          <>
+            <NavigationMenuItem>
+              <p className="text-sm font-medium">{user.email}</p>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <button
+                onClick={logout}
+                className={navigationMenuTriggerStyle()}
+              >
+                Logout
+              </button>
+            </NavigationMenuItem>
+          </>
+        ) : (
+          <>
+            <NavigationMenuItem>
+              <NavigationMenuLink
+                asChild
+                className={navigationMenuTriggerStyle()}
+              >
+                <Link href="/signin">Sign In</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink
+                asChild
+                className={navigationMenuTriggerStyle()}
+              >
+                <Link href="/signup">Sign Up</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          </>
+        )}
       </NavigationMenuList>
     </NavigationMenu>
     </div>
