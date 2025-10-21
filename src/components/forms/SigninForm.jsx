@@ -1,8 +1,8 @@
 "use client";
-import { useEffect } from "react";
+
 import Link from "next/link";
-import { useActionState } from "react";
-import { loginUserAction } from "@/src/data/actions/auth-actions";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   CardTitle,
@@ -15,35 +15,41 @@ import {
 
 import { Label } from "@/src/components/ui/label";
 import { Input } from "@/src/components/ui/input";
-import { StrapiErrors } from "@/src/components/custom/StrapiErrors";
 import { SubmitButton } from "@/src/components/custom/SubmitButton";
 
-const INITIAL_STATE = {
-  strapiErrors: null,
-  data: null,
-  message: null,
-};
-
 export function SigninForm() {
-  const [formState, formAction] = useActionState(
-    loginUserAction,
-    INITIAL_STATE
-  );
+  const router = useRouter();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Nota: Este useEffect solo lo dejo para probar la conexión a Databricks por defecto en google calendar bronze.
-  // En producción, la lógica de datos debe separarse y apuntar al endpoint adecuado.
-  useEffect(() => {
-    fetch("/api/calendar-bronze")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Datos de Databricks:", data);
-      })
-      .catch((err) => console.error("Error fetch Databricks:", err));
-  }, []);
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError("");
+    setLoading(true);
+
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    setLoading(false);
+
+    if (res.ok) {
+      router.push("/dashboard");
+    } else {
+      const data = await res.json();
+      setError(data.error || "Invalid credentials");
+    }
+  }
 
   return (
     <div className="w-full max-w-md">
-      <form action={formAction}>
+      <form onSubmit={handleSubmit}>
         <Card>
           <CardHeader className="space-y-1">
             <CardTitle className="text-3xl font-bold">Sign In</CardTitle>
@@ -55,10 +61,11 @@ export function SigninForm() {
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
-                id="identifier"
-                name="identifier"
-                type="text"
-                placeholder="username or email"
+                id="email"
+                name="email"
+                type="email"
+                placeholder="name@example.com"
+                required
               />
             </div>
             <div className="space-y-2">
@@ -68,21 +75,25 @@ export function SigninForm() {
                 name="password"
                 type="password"
                 placeholder="password"
+                required
               />
             </div>
+
+            {error && (
+              <p className="text-red-500 text-sm text-center mt-2">{error}</p>
+            )}
           </CardContent>
           <CardFooter className="flex flex-col">
             <SubmitButton
               className="w-full"
-              text="Sign In"
+              text={loading ? "Loading..." : "Sign In"}
               loadingText="Loading"
             />
-            <StrapiErrors error={formState?.strapiErrors} />
           </CardFooter>
         </Card>
         <div className="mt-4 text-center text-sm">
           Don't have an account?
-          <Link className="underline ml-2" href="signup">
+          <Link className="underline ml-2" href="/auth/signup">
             Sign Up
           </Link>
         </div>
