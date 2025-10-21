@@ -1,5 +1,9 @@
-import { SigninForm } from "@/src/components/forms/SigninForm"
+import { SigninForm } from "@/src/components/forms/SigninForm";
 
-export default function SignInRoute() {
-  return <SigninForm />
+export default function SigninPage() {
+  return (
+    <div className="flex justify-center items-center min-h-screen">
+      <SigninForm />
+    </div>
+  );
 }
