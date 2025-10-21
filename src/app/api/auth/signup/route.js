@@ -2,6 +2,7 @@ import { queryDatabricks } from "@/src/lib/databricks";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { SignJWT } from "jose";
+import { USERS_TABLE } from "@/src/utils/constants";
 
 export async function POST(req) {
   try {
@@ -16,7 +17,7 @@ export async function POST(req) {
 
     const catalog = process.env.DATABRICKS_CATALOG;
     const schema = process.env.DATABRICKS_SCHEMA_BRONZE;
-    const table = "users";
+    const table = USERS_TABLE;
 
     // 🔎 Verificar si el usuario ya existe
     const existing = await queryDatabricks(`
