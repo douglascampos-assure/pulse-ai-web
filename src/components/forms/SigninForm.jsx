@@ -1,5 +1,5 @@
 "use client";
-
+import { useEffect } from "react";
 import Link from "next/link";
 import { useActionState } from "react";
 import { loginUserAction } from "@/src/data/actions/auth-actions";
@@ -25,7 +25,21 @@ const INITIAL_STATE = {
 };
 
 export function SigninForm() {
-  const [formState, formAction] = useActionState(loginUserAction, INITIAL_STATE);
+  const [formState, formAction] = useActionState(
+    loginUserAction,
+    INITIAL_STATE
+  );
+
+  // Nota: Este useEffect solo lo dejo para probar la conexión a Databricks por defecto en google calendar bronze.
+  // En producción, la lógica de datos debe separarse y apuntar al endpoint adecuado.
+  useEffect(() => {
+    fetch("/api/calendar-bronze")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Datos de Databricks:", data);
+      })
+      .catch((err) => console.error("Error fetch Databricks:", err));
+  }, []);
 
   return (
     <div className="w-full max-w-md">
