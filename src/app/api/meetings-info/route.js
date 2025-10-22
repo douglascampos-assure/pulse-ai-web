@@ -10,14 +10,13 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const email = searchParams.get("email");
     const sql = `
-      SELECT *
-      FROM workspace.silver.attendee_participations_clean
-      WHERE meeting_url IN (
-        SELECT meeting_url 
-        FROM ${catalog}.${schema}.${meetings}
-        WHERE correo='${email}'
-        LIMIT 20
-      )
+        SELECT 
+            apc.*,
+            gc.titulo
+        FROM workspace.silver.attendee_participations_clean AS apc
+        JOIN workspace.silver.google_calendar AS gc
+            ON apc.meeting_url = gc.video_link
+        WHERE gc.participante = '${email}';
     `;
     console.log("sql!!!!!");
     console.log(sql);
