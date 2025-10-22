@@ -51,10 +51,10 @@ const itemsDefault = [
 
 
 
-export function ComboBox({ items = itemsDefault, itemsLabel = itemsLabelDefault }) {
+export function ComboBox({ items = itemsDefault, itemsLabel = itemsLabelDefault, setSelected = () => null }) {
   const [open, setOpen] = React.useState(false)
   const isMobile = useIsMobile()
-  const [selectedStatus, setSelectedStatus] = React.useState(
+  const [selectedInner, setSelectedInner] = React.useState(
     null
   )
   const labelCleaned = toSnakeCase(itemsLabel, "combobox")
@@ -68,11 +68,11 @@ export function ComboBox({ items = itemsDefault, itemsLabel = itemsLabelDefault 
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" className="w-[150px] justify-start">
-            {selectedStatus ? <>{selectedStatus.label}</> : <>+ Set {itemsLabel}</>}
+            {selectedInner ? <>{selectedInner.label}</> : <>+ Set {itemsLabel}</>}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0" align="start">
-          <StatusList items={items} itemsLabel={itemsLabel} setOpen={setOpen} setSelectedStatus={setSelectedStatus} />
+          <StatusList items={items} itemsLabel={itemsLabel} setOpen={setOpen} setSelected={(value) => { setSelectedInner(value); setSelected(value); }} />
         </PopoverContent>
       </Popover>
     </div>
@@ -87,12 +87,12 @@ export function ComboBox({ items = itemsDefault, itemsLabel = itemsLabelDefault 
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>
           <Button variant="outline" className="w-[150px] justify-start">
-            {selectedStatus ? <>{selectedStatus.label}</> : <>+ Set {itemsLabel}</>}
+            {selectedInner ? <>{selectedInner.label}</> : <>+ Set {itemsLabel}</>}
           </Button>
         </DrawerTrigger>
         <DrawerContent>
           <div className="mt-4 border-t">
-            <StatusList items={items} itemsLabel={itemsLabel} setOpen={setOpen} setSelectedStatus={setSelectedStatus} />
+            <StatusList items={items} itemsLabel={itemsLabel} setOpen={setOpen} setSelected={(value) => { setSelectedInner(value); setSelected(value); }} />
           </div>
         </DrawerContent>
       </Drawer>
@@ -104,7 +104,7 @@ function StatusList({
   items,
   itemsLabel,
   setOpen,
-  setSelectedStatus,
+  setSelected,
 }) {
   return (
     <Command>
@@ -117,7 +117,7 @@ function StatusList({
                 key={item.value}
                 value={item.value}
                 onSelect={(value) => {
-                    setSelectedStatus(
+                    setSelected(
                     items.find((priority) => priority.value === value) || null
                     )
                     setOpen(false)

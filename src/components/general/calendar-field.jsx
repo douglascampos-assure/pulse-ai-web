@@ -15,9 +15,9 @@ import {
 
 const labelDefault = "Date"
 
-export function CalendarField({ label = labelDefault, setDateFather = () => null }) {
+export function CalendarField({ label = labelDefault, setDate = () => null }) {
   const [open, setOpen] = React.useState(false)
-  const [date, setDate] = React.useState(undefined)
+  const [dateInner, setDateInner] = React.useState(undefined)
   const labelCleaned = toSnakeCase(label)
 
   return (
@@ -32,18 +32,18 @@ export function CalendarField({ label = labelDefault, setDateFather = () => null
             id={labelCleaned}
             className="w-48 justify-between font-normal"
           >
-            {date ? date.toLocaleDateString() : "Select date"}
+            {dateInner ? dateInner.toLocaleDateString() : "Select date"}
             <ChevronDownIcon />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto overflow-hidden p-0" align="start">
           <Calendar
             mode="single"
-            selected={date}
+            selected={dateInner}
             captionLayout="dropdown"
             onSelect={(date) => {
               setDate(date)
-              setDateFather(date)
+              setDateInner(date)
               setOpen(false)
             }}
           />

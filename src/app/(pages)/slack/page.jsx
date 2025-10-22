@@ -10,9 +10,11 @@ export default function DashboardRoute() {
     <>
       <NavBar />
       <div className="flex gap-4">
-        <CalendarField />
-        <CalendarField />
-        <ComboBox />
+        <ComboBox itemsLabel="Teams" />
+        <ComboBox itemsLabel="Team Member" />
+        <CalendarField label="Start Date" />
+        <CalendarField label="End Date"  />
+        <ComboBox itemsLabel="Team Member" />
       </div>
       <div className="flex-grow grid place-items-center">
         <PieDonut />
