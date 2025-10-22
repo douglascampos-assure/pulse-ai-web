@@ -25,7 +25,7 @@ import {
   PopoverTrigger,
 } from "@/src/components/ui/popover"
 
-const itemsLabelDefault = "Item";
+const labelDefault = "Item";
 const itemsDefault = [
   {
     value: "backlog",
@@ -51,28 +51,28 @@ const itemsDefault = [
 
 
 
-export function ComboBox({ items = itemsDefault, itemsLabel = itemsLabelDefault, setSelected = () => null }) {
+export function ComboBox({ items = itemsDefault, label = labelDefault, setSelected = () => null }) {
   const [open, setOpen] = React.useState(false)
   const isMobile = useIsMobile()
   const [selectedInner, setSelectedInner] = React.useState(
     null
   )
-  const labelCleaned = toSnakeCase(itemsLabel, "combobox")
+  const labelCleaned = toSnakeCase(label, "combobox")
 
   if (!isMobile) {
     return (
     <div className="flex flex-col gap-3">
       <Label htmlFor={labelCleaned} className="px-1">
-        {itemsLabel}
+        {label}
       </Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" className="w-[150px] justify-start">
-            {selectedInner ? <>{selectedInner.label}</> : <>+ Set {itemsLabel}</>}
+            {selectedInner ? <>{selectedInner.label}</> : <>+ Set {label}</>}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0" align="start">
-          <StatusList items={items} itemsLabel={itemsLabel} setOpen={setOpen} setSelected={(value) => { setSelectedInner(value); setSelected(value); }} />
+          <StatusList items={items} label={label} setOpen={setOpen} setSelected={(value) => { setSelectedInner(value); setSelected(value); }} />
         </PopoverContent>
       </Popover>
     </div>
@@ -82,17 +82,17 @@ export function ComboBox({ items = itemsDefault, itemsLabel = itemsLabelDefault,
   return (
     <div className="flex flex-col gap-3">
       <Label htmlFor={labelCleaned} className="px-1">
-        {itemsLabel}
+        {label}
       </Label>
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>
           <Button variant="outline" className="w-[150px] justify-start">
-            {selectedInner ? <>{selectedInner.label}</> : <>+ Set {itemsLabel}</>}
+            {selectedInner ? <>{selectedInner.label}</> : <>+ Set {label}</>}
           </Button>
         </DrawerTrigger>
         <DrawerContent>
           <div className="mt-4 border-t">
-            <StatusList items={items} itemsLabel={itemsLabel} setOpen={setOpen} setSelected={(value) => { setSelectedInner(value); setSelected(value); }} />
+            <StatusList items={items} label={label} setOpen={setOpen} setSelected={(value) => { setSelectedInner(value); setSelected(value); }} />
           </div>
         </DrawerContent>
       </Drawer>
@@ -102,13 +102,13 @@ export function ComboBox({ items = itemsDefault, itemsLabel = itemsLabelDefault,
 
 function StatusList({
   items,
-  itemsLabel,
+  label,
   setOpen,
   setSelected,
 }) {
   return (
     <Command>
-        <CommandInput placeholder={`Filter ${itemsLabel}...`} />
+        <CommandInput placeholder={`Filter ${label}...`} />
         <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
@@ -118,7 +118,7 @@ function StatusList({
                 value={item.value}
                 onSelect={(value) => {
                     setSelected(
-                    items.find((priority) => priority.value === value) || null
+                    items.find((itemTmp) => itemTmp.value === value) || null
                     )
                     setOpen(false)
                 }}
