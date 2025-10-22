@@ -16,10 +16,12 @@ import {
 import { Label } from "@/src/components/ui/label";
 import { Input } from "@/src/components/ui/input";
 import { SubmitButton } from "@/src/components/custom/SubmitButton";
+import { useAuth } from "@/src/context/AuthContext";
 
 export function SigninForm() {
   const router = useRouter();
   const [error, setError] = useState("");
+  const { login } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (event) => {
@@ -31,21 +33,15 @@ export function SigninForm() {
     const email = formData.get("email");
     const password = formData.get("password");
 
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
+    const result = await login(email, password);
     setLoading(false);
 
-    if (res.ok) {
+    if (result.ok) {
       router.push("/dashboard");
     } else {
-      const data = await res.json();
-      setError(data.error || "Invalid credentials");
+      setError(result.error || "Invalid credentials");
     }
-  }
+  };
 
   return (
     <div className="w-full max-w-md">
