@@ -20,7 +20,6 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
-  console.log(user);
   return (
     <aside className="w-64 bg-primary text-gray-200 flex flex-col border-r border-gray-800">
       {/* Logo - Logo Assuresoft?*/}
