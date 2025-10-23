@@ -298,7 +298,7 @@ export function MeetingDashboard({ loadingText, className }) {
           </div>
           {/* Stat Cards */}
           <div className="flex flex-col justify-between gap-4 w-[180px]">
-            <StatCard title="Participants" value={participantsLists.length} />
+            <StatCard title="Participants" value={participantsLists.length - 1} />
             <StatCard title="Avg. Participation Min" value={averageParticipation} />
           </div>
         </div>
