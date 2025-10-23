@@ -1,15 +1,7 @@
-import { BarGraph } from "@/src/components/charts/bar"
-import { PieDonut } from "@/src/components/charts/pie-donut"
-import { NavBar } from "@/src/components/general/nav-bar"
-import { MeetingDashboard } from "@/src/components/custom/MeetingDashboard"
-
-export default function DashboardRoute() {
+export default function DashboardPage() {
   return (
-    <>
-      <NavBar />
-      <div className="flex-grow grid place-items-center">
-        <MeetingDashboard />
-      </div>
-    </>
+    <div className="grid place-items-center h-full">
+      <h1 className="text-3xl font-bold">Dashboard Overview</h1>
+    </div>
   );
 }
