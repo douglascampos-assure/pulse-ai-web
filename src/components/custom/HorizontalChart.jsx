@@ -69,6 +69,7 @@ export function HorizontalChart({
             >
             {chartData.map((entry, index) => {
                 const name = entry[nameKey];
+                console.log("chart config:::: ", chartConfig)
                 const color = chartConfig[name]?.color || "var(--chart-1)";
                 return <Cell key={`cell-${index}`} fill={color} />;
             })}

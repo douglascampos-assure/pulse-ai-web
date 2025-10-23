@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
 import {
   CardTitle,
   CardDescription,
@@ -12,7 +11,6 @@ import {
   CardFooter,
   Card,
 } from "@/src/components/ui/card";
-
 import { Label } from "@/src/components/ui/label";
 import { Input } from "@/src/components/ui/input";
 import { SubmitButton } from "@/src/components/custom/SubmitButton";
@@ -45,7 +43,7 @@ export function SigninForm() {
       const data = await res.json();
       setError(data.error || "Invalid credentials");
     }
-  }
+  };
 
   return (
     <div className="w-full max-w-md">
@@ -60,23 +58,11 @@ export function SigninForm() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="name@example.com"
-                required
-              />
+              <Input id="email" name="email" type="email" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="password"
-                required
-              />
+              <Input id="password" name="password" type="password" required />
             </div>
 
             {error && (
@@ -92,7 +78,7 @@ export function SigninForm() {
           </CardFooter>
         </Card>
         <div className="mt-4 text-center text-sm">
-          Don't have an account?
+          Don’t have an account?
           <Link className="underline ml-2" href="/signup">
             Sign Up
           </Link>
