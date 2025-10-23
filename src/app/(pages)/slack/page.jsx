@@ -114,7 +114,7 @@ export default function DashboardRoute() {
         <div className="flex flex-grow flex-row gap-4">
           <LoaderWrapper status={status}>
             <div className="mx-auto aspect-square max-h-[1000px] max-w-[600px] w-[500px] h-[300px]">
-            <PieDonut title="Highlighted Features" description="Kudos" centerText="Amount" chartConfig={chartData.chartConfig} chartData={chartData.chartData} />
+              <PieDonut title="Highlighted Features" description="Kudos" centerText="Amount" chartConfig={chartData.chartConfig} chartData={chartData.chartData} />
             </div>
           </LoaderWrapper>
           <div className="flex flex-col gap-4">
