@@ -72,7 +72,7 @@ export function ComboBox({ items = itemsDefault, label = labelDefault, setSelect
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0" align="start">
-          <StatusList items={items} label={label} setOpen={setOpen} setSelected={(value) => { setSelectedInner(value); setSelected(value); }} />
+          <ItemsList items={items} label={label} setOpen={setOpen} selected={selectedInner} setSelected={(value) => { setSelectedInner(value); setSelected(value); }} />
         </PopoverContent>
       </Popover>
     </div>
@@ -92,7 +92,7 @@ export function ComboBox({ items = itemsDefault, label = labelDefault, setSelect
         </DrawerTrigger>
         <DrawerContent>
           <div className="mt-4 border-t">
-            <StatusList items={items} label={label} setOpen={setOpen} setSelected={(value) => { setSelectedInner(value); setSelected(value); }} />
+            <ItemsList items={items} label={label} setOpen={setOpen} selected={selectedInner} setSelected={(value) => { setSelectedInner(value); setSelected(value); }} />
           </div>
         </DrawerContent>
       </Drawer>
@@ -100,10 +100,11 @@ export function ComboBox({ items = itemsDefault, label = labelDefault, setSelect
   )
 }
 
-function StatusList({
+function ItemsList({
   items,
   label,
   setOpen,
+  selected,
   setSelected,
 }) {
   return (
@@ -117,13 +118,19 @@ function StatusList({
                 key={item.value}
                 value={item.value}
                 onSelect={(value) => {
-                    setSelected(
-                    items.find((itemTmp) => itemTmp.value === value) || null
-                    )
-                    setOpen(false)
+                    const clickedItem = items.find((itemTmp) => itemTmp.value === value);
+                    if (selected?.value === clickedItem?.value) {
+                      setSelected(null);
+                    } else {
+                      setSelected(clickedItem || null);
+                    }
+                    setOpen(false);
                 }}
                 >
                 {item.label}
+                {selected?.value === item.value && (
+                  <span className="ml-auto text-primary">✓</span>
+                )}
                 </CommandItem>
             ))}
             </CommandGroup>

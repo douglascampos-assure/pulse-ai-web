@@ -1,8 +1,11 @@
 "use client";
+import { Spinner } from "@/src/components/ui/spinner"
 
 export function LoaderWrapper({ status, children }) {
   if (status.type === "loading") {
-    return <div>{status.detail || "Loading..."}</div>;
+    return <div className="flex items-center">
+      <Spinner className="size-32" />
+    </div>;
   }
 
   if (status.type === "error") {
