@@ -208,6 +208,7 @@ export function useSlack() {
     types,
     details,
     pins,
+    member,
     setDetail,
     setType,
     setMember,

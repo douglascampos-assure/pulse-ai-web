@@ -24,7 +24,7 @@ export default function Sidebar({ showThemeToggle = false }) {
   return (
     <aside className="w-64 bg-primary text-gray-200 flex flex-col border-r border-gray-800">
       {/* Logo - Logo Assuresoft?*/}
-      <div className="h-16 flex items-center justify-center border-b border-gray-800">
+      <div className="h-16 flex items-center justify-center border-b border-gray-800 gap-4">
         <span className="text-lg font-bold tracking-wide text-white">
           Pulse<span className="text-blue-400">AI</span>
         </span>
