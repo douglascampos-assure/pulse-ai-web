@@ -1,7 +1,7 @@
-import { queryDatabricks } from "@/src/lib/databricks";
+import { queryDatabricks } from "@/src/lib/databricks"
+import { GOLD_SLACK_TABLE } from "@/src/utils/constants"
 
 const schema = process.env.DATABRICKS_SCHEMA_GOLD
-const slack = process.env.DATABRICKS_TABLE_SLACK
 const catalog = process.env.DATABRICKS_CATALOG
 
 export async function GET(req) {
@@ -16,7 +16,7 @@ export async function GET(req) {
     const supervisor = searchParams.get("supervisor")
     let sql = `
       SELECT *
-      FROM ${catalog}.${schema}.${slack}
+      FROM ${catalog}.${schema}.${GOLD_SLACK_TABLE}
       WHERE type_congratulation is not NULL
     `;
     if (employeeId) {

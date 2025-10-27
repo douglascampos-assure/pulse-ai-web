@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { Home, Users, BarChart3, Calendar, MessageCircle } from "lucide-react";
 import { SiSlack, SiJira } from "react-icons/si";
 import { useAuth } from "@/src/context/AuthContext";
@@ -17,7 +17,9 @@ const links = [
   { href: "/dashboard/teams", label: "Teams", icon: Users },
 ];
 
-export default function Sidebar({ showThemeToggle = false }) {
+export default function Sidebar() {
+  const searchParams = useSearchParams();
+  const showToogle = searchParams.get('dark') === 'true';
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
@@ -28,7 +30,7 @@ export default function Sidebar({ showThemeToggle = false }) {
         <span className="text-lg font-bold tracking-wide text-white">
           Pulse<span className="text-blue-400">AI</span>
         </span>
-        {showThemeToggle && <ModeToggle />}
+        {showToogle && <ModeToggle />}
       </div>
 
       {user && (
