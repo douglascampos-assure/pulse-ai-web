@@ -20,23 +20,38 @@ export function CalendarField({ label = labelDefault, setDate = () => null }) {
   const [dateInner, setDateInner] = React.useState(undefined)
   const labelCleaned = toSnakeCase(label)
 
+  const buttonClasses =
+    "w-full px-2 py-1.5 text-xs border border-gray-300 rounded bg-white text-slate-900 font-medium justify-between focus:outline-none focus:ring-1 focus:ring-slate-500 hover:bg-slate-50"
+
   return (
-    <div className="flex flex-col gap-3">
-      <Label htmlFor={labelCleaned} className="px-1">
+    <div className="bg-white rounded-lg p-2 border border-gray-200">
+      {/* Label */}
+      <Label
+        htmlFor={labelCleaned}
+        className="text-xs font-semibold text-slate-700 mb-1 block"
+      >
         {label}
       </Label>
+
+      {/* Calendar Popover */}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
-            variant="outline"
+            variant="ghost"
             id={labelCleaned}
-            className="w-48 justify-between font-normal"
+            className={buttonClasses}
           >
-            {dateInner ? dateInner.toLocaleDateString() : "Select date"}
-            <ChevronDownIcon />
+            <span>
+              {dateInner ? dateInner.toLocaleDateString() : "Select date"}
+            </span>
+            <ChevronDownIcon className="h-3.5 w-3.5 text-slate-500 ml-1" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+
+        <PopoverContent
+          className="w-auto p-0 border border-gray-200 rounded-md shadow-sm"
+          align="start"
+        >
           <Calendar
             mode="single"
             selected={dateInner}

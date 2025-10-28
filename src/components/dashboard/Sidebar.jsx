@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { Home, Users, BarChart3, Calendar, MessageCircle } from "lucide-react";
 import { SiSlack, SiJira } from "react-icons/si";
 import { useAuth } from "@/src/context/AuthContext";
+import { ModeToggle } from "@/src/components/general/mode-toggle"
 
 const links = [
   { href: "/dashboard", label: "Overview", icon: Home },
@@ -17,16 +18,19 @@ const links = [
 ];
 
 export default function Sidebar() {
+  const searchParams = useSearchParams();
+  const showToogle = searchParams.get('dark') === 'true';
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
   return (
     <aside className="w-64 bg-primary text-gray-200 flex flex-col border-r border-gray-800">
       {/* Logo - Logo Assuresoft?*/}
-      <div className="h-16 flex items-center justify-center border-b border-gray-800">
+      <div className="h-16 flex items-center justify-center border-b border-gray-800 gap-4">
         <span className="text-lg font-bold tracking-wide text-white">
           Pulse<span className="text-blue-400">AI</span>
         </span>
+        {showToogle && <ModeToggle />}
       </div>
 
       {user && (
