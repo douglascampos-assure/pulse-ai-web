@@ -22,7 +22,7 @@ export async function POST(req) {
     // 🔎 Verificar si el usuario ya existe
     const existing = await queryDatabricks(`
       SELECT * FROM ${catalog}.${schema}.${table}
-      WHERE email = '${email}' LIMIT 1
+      WHERE user_email = '${email}' LIMIT 1
     `);
 
     if (existing.length > 0) {
@@ -33,12 +33,12 @@ export async function POST(req) {
     }
 
     // Encriptar contraseña
-    const hashedPassword = await bcrypt.hash(password, 10);
+    //const hashedPassword = await bcrypt.hash(password, 10);
 
     // Crear usuario
     await queryDatabricks(`
-      INSERT INTO ${catalog}.${schema}.${table} (email, password)
-      VALUES ('${email}', '${hashedPassword}')
+      INSERT INTO ${catalog}.${schema}.${table} (user_email, password)
+      VALUES ('${email}', '${password}')
     `);
 
     // Crear token de sesión (igual que en login)
