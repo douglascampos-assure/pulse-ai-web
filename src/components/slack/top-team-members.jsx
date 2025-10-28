@@ -16,7 +16,7 @@ export function TopTeamMembers({ userMentions = [] }) {
         <CardTitle>Most Appreciated Team Members</CardTitle>
       </CardHeader>
 
-      <CardContent className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 p-2 rounded-md">
+      <CardContent className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent hover:scrollbar-thumb-gray-500 pb-2 rounded-md">
         {userMentions.length > 0 ? (
           <div className="flex flex-col gap-2">
             {userMentions.map((userMention) => (

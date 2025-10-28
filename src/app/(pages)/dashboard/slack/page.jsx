@@ -29,13 +29,13 @@ function prepareKudosByFeatureChartData(data) {
   const colors = [
     "var(--chart-1)",
     "var(--chart-2)",
-    "var(--chart-3)",
-    "var(--chart-4)",
-    "var(--chart-5)",
     "var(--chart-6)",
     "var(--chart-7)",
+    "var(--chart-3)",
+    "var(--chart-4)",
     "var(--chart-8)",
     "var(--chart-9)",
+    "var(--chart-5)",
   ]
 
   const chartData = sortedEntries.map(([feature, amount], idx) => ({
@@ -148,33 +148,29 @@ export default function SlackPage() {
           </CardContent>
         </Card>
       </div>
-      <div className="flex flex-grow flex-row gap-4 w-[80vw] h-[500px]">
-        <div className="mx-auto aspect-square w-[60vw] h-[500px]">
-          <LoaderWrapper status={status}>
-            <PieDonut title="Highlighted Features" description="Kudos" centerText="Amount" chartConfig={chartData.chartConfig} chartData={chartData.chartData} />
-          </LoaderWrapper>
-        </div>
-        <div className="flex flex-col gap-1 w-[20vw] h-[500px]">
-          <div className={!member ? "flex flex-row gap-4 h-[140px]" : "flex flex-row gap-4 h-full"}>
-            <LoaderWrapper status={status}>
-              <CardBasic footer="Number of mentions" value={kudos.length} />
-            </LoaderWrapper>
+      <LoaderWrapper status={status}>
+        <>
+          <div className="flex flex-grow flex-row gap-4 w-[80vw] h-[500px]">
+            <div className="mx-auto aspect-square w-[60vw] h-[500px]">
+                <PieDonut title="Highlighted Features" description="Kudos" centerText="Amount" chartConfig={chartData.chartConfig} chartData={chartData.chartData} />
+            </div>
+            <div className={member ? "flex flex-col gap-1 w-[20vw] h-[500px]" : "flex flex-col gap-1 w-[20vw] h-full"}>
+              <div className={!member ? "flex flex-row gap-4 h-[140px]" : "flex flex-row gap-4 h-full"}>
+                <CardBasic footer="Number of mentions" value={kudos.length} />
+              </div>
+              {!member && <TopTeamMembers userMentions={userMentions}/>}
+            </div>
           </div>
-          {!member && <LoaderWrapper status={status}>
-            <TopTeamMembers userMentions={userMentions}/>
-          </LoaderWrapper>}
-        </div>
-      </div>
-      {member && <div className="flex flex-col gap-4 w-[80vw] z-10">
-        <Card className="w-full">
-          <CardContent className="w-full">
-            <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Kudos Details</h3>
-            <LoaderWrapper status={status}>
-              <div className="h-full w-full"><TableBasic caption="All kudos made" columns={tableData.columns} rows={tableData.rows} /></div>
-            </LoaderWrapper>
-          </CardContent>
-        </Card>
-      </div>}
+          {member && <div className="flex flex-col gap-4 w-[80vw] z-10">
+            <Card className="w-full">
+              <CardContent className="w-full">
+                <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Kudos Details</h3>
+                <div className="h-full w-full"><TableBasic caption="All kudos made" columns={tableData.columns} rows={tableData.rows} /></div>
+              </CardContent>
+            </Card>
+          </div>}
+        </>
+      </LoaderWrapper>
     </div>
   );
 }

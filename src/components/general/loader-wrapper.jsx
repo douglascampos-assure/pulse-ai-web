@@ -4,7 +4,7 @@ import { Spinner } from "@/src/components/ui/spinner"
 export function LoaderWrapper({ status, children }) {
   if (status.type === "loading") {
     return <div className="flex items-center">
-      <Spinner className="size-32" />
+      <Spinner className="size-8" />
     </div>;
   }
 

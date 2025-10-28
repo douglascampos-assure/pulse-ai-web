@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { ChevronDownIcon } from "lucide-react"
 import { toSnakeCase } from "@/src/utils/texts"
 import { useIsMobile } from "@/src/hooks/use-mobile"
 import { Button } from "@/src/components/ui/button"
@@ -59,6 +60,7 @@ export function ComboBox({
           <PopoverTrigger asChild>
             <Button variant="ghost" className={buttonClasses}>
               {selectedInner ? selectedInner.label : `Select ${label}...`}
+              <ChevronDownIcon className="h-3.5 w-3.5 text-slate-500 ml-1" />
             </Button>
           </PopoverTrigger>
           <PopoverContent
