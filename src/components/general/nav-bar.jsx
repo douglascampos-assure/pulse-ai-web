@@ -171,7 +171,7 @@ export function NavBar() {
         {user ? (
           <>
             <NavigationMenuItem>
-              <p className="text-sm font-medium">{user.email}</p>
+              <p className="text-sm font-medium">{user.user_email}</p>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <button
