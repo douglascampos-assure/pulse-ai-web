@@ -38,12 +38,12 @@ export default function Sidebar() {
           <div className="flex-none w-16 h-16 rounded-full bg-blue-500 overflow-hidden border border-gray-500 mb-3">
             <img
               src={user?.image || "/images/test-avatar.jpg"}
-              alt={user?.email || "User avatar"}
+              alt={user?.user_email || "User avatar"}
               className="w-full h-full object-cover"
             />
           </div>
           <p className="text-xs text-gray-400">
-            {user.email || "user@email.com"}
+            {user.user_email || "user@email.com"}
           </p>
         </div>
       )}

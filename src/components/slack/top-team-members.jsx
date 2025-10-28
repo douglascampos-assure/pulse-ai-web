@@ -12,7 +12,7 @@ import { CardBoard } from "@/src/components/slack/card-board"
 export function TopTeamMembers({ userMentions = [] }) {
   return (
     <Card className="mx-auto w-full h-[355px] flex flex-col">
-      <CardHeader className="pb-2">
+      <CardHeader>
         <CardTitle>Most Appreciated Team Members</CardTitle>
       </CardHeader>
 

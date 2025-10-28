@@ -6,31 +6,53 @@ import {
   Card,
   CardContent,
 } from "@/src/components/ui/card"
-import { Wordcloud } from "@/src/components/charts/wordcloud"
+import { PieDonut } from "@/src/components/charts/pie-donut"
 import { ComboBox } from "@/src/components/general/combobox"
 import { LoaderWrapper } from "@/src/components/general/loader-wrapper"
 import { CalendarField } from "@/src/components/general/calendar-field"
 import { TableBasic } from "@/src/components/general/table-basic"
 import { CardBasic } from "@/src/components/general/card-basic"
 import { TopTeamMembers } from "@/src/components/slack/top-team-members"
+import { toSnakeCase, cleanKudos } from "@/src/utils/texts"
 import { useSlack } from "@/src/hooks/use-slack"
 
 
-function prepareKudosByFeatureWordCloudData(data) {
+function prepareKudosByFeatureChartData(data) {
   const counts = data.reduce((acc, item) => {
-    const feature = item.highlighted_feature || "Other";
-    acc[feature] = (acc[feature] || 0) + 1;
-    return acc;
-  }, {});
+    const feature = item.highlighted_feature || "Other"
+    acc[feature] = (acc[feature] || 0) + 1
+    return acc
+  }, {})
 
-  const sortedEntries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const sortedEntries = Object.entries(counts).sort((a, b) => b[1] - a[1])
 
-  const words = sortedEntries.map(([feature, count]) => ({
-    text: feature,
-    value: count,
-  }));
+  const colors = [
+    "var(--chart-1)",
+    "var(--chart-2)",
+    "var(--chart-3)",
+    "var(--chart-4)",
+    "var(--chart-5)",
+    "var(--chart-6)",
+    "var(--chart-7)",
+    "var(--chart-8)",
+    "var(--chart-9)",
+  ]
 
-  return words;
+  const chartData = sortedEntries.map(([feature, amount], idx) => ({
+    text: toSnakeCase(feature),
+    label: feature,
+    amount,
+    fill: colors[idx % colors.length],
+  }))
+
+  const chartConfig = Object.fromEntries(
+    sortedEntries.map(([feature], idx) => [
+      toSnakeCase(feature),
+      { label: feature, color: colors[idx % colors.length] },
+    ])
+  )
+
+  return { chartData, chartConfig }
 }
 
 function prepareCongratulationsTableData(data) {
@@ -38,8 +60,8 @@ function prepareCongratulationsTableData(data) {
 
   const columns = [
     {
-        "label": "Email",
-        "field": "workEmail",
+        "label": "Highlighted Features",
+        "field": "highlighted_features",
         "className": "",
         "classNameRows": "",
         "totalRow": false,
@@ -52,60 +74,12 @@ function prepareCongratulationsTableData(data) {
         "classNameRows": "",
         "totalRow": false,
         "type": "string"
-    },
-    {
-        "label": "Highlighted Features",
-        "field": "highlighted_features",
-        "className": "",
-        "classNameRows": "",
-        "totalRow": false,
-        "type": "string"
-    },
-    {
-        "label": "Type",
-        "field": "type_congratulation",
-        "className": "",
-        "classNameRows": "",
-        "totalRow": false,
-        "type": "string"
-    },
-    {
-        "label": "Detail",
-        "field": "detail_congratulation",
-        "className": "",
-        "classNameRows": "",
-        "totalRow": false,
-        "type": "string"
-    },
-    {
-        "label": "Pin",
-        "field": "pin_congratulation",
-        "className": "",
-        "classNameRows": "",
-        "totalRow": false,
-        "type": "string"
-    },
-    {
-        "label": "Supervisor",
-        "field": "supervisor",
-        "className": "",
-        "classNameRows": "",
-        "totalRow": false,
-        "type": "string"
-    },
-    {
-        "label": "Date",
-        "field": "congratulations_date",
-        "className": "",
-        "classNameRows": "",
-        "totalRow": false,
-        "type": "string"
     }
   ]
 
   const rows = data.map((item) => ({
     ...item,
-    congratulations_date: new Date(item.congratulations_date).toLocaleDateString(),
+    plain_message: cleanKudos(item.plain_message),
   }))
 
   return { columns, rows }
@@ -144,12 +118,15 @@ export default function SlackPage() {
     columns: [],
     rows: []
   })
-  const [words, setWords] = React.useState([])
+  const [chartData, setChartData] = React.useState({
+    chartData: [],
+    chartConfig: {}
+  })
   const [userMentions, setUserMentions] = React.useState([])
   React.useEffect(() => {
     setTableData(prepareCongratulationsTableData(kudos))
+    setChartData(prepareKudosByFeatureChartData(kudos))
     setUserMentions(groupAndSortKudos(kudos))
-    setWords(prepareKudosByFeatureWordCloudData(kudos))
   }, [kudos])
   return (
     <div className="flex flex-col p-4 justify-center items-center gap-4">
@@ -174,7 +151,7 @@ export default function SlackPage() {
       <div className="flex flex-grow flex-row gap-4 w-[80vw] h-[500px]">
         <div className="mx-auto aspect-square w-[60vw] h-[500px]">
           <LoaderWrapper status={status}>
-            <Wordcloud words={words} />
+            <PieDonut title="Highlighted Features" description="Kudos" centerText="Amount" chartConfig={chartData.chartConfig} chartData={chartData.chartData} />
           </LoaderWrapper>
         </div>
         <div className="flex flex-col gap-1 w-[20vw] h-[500px]">
@@ -188,7 +165,7 @@ export default function SlackPage() {
           </LoaderWrapper>}
         </div>
       </div>
-      <div className="flex flex-col gap-4 w-[80vw] z-10">
+      {member && <div className="flex flex-col gap-4 w-[80vw] z-10">
         <Card className="w-full">
           <CardContent className="w-full">
             <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Kudos Details</h3>
@@ -197,7 +174,7 @@ export default function SlackPage() {
             </LoaderWrapper>
           </CardContent>
         </Card>
-      </div>
+      </div>}
     </div>
   );
 }
