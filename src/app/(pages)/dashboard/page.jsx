@@ -1,8 +1,41 @@
+"use client";
+import TeamMemberByManager from "@/src/components/custom/TeamMemberByManager";
 import SimpleCard from "@/src/components/ui/simple-card";
+import { useAuth } from "@/src/context/AuthContext";
+import { useTeamsByManager } from "@/src/hooks/useTeamsByManager";
+import { useState, useEffect } from "react";
 
 export default function DashboardPage() {
+  const { user, logout } = useAuth();
+  const email = user?.email;
+  const { teams, loading } = useTeamsByManager(email);
+  const [selectedTeam, setSelectedTeam] = useState("");
+  const [LoadingTeam, setLoadingTeam] = useState(false);
+
+  async function loadTeamData(teamName) {
+    if (!teamName) return;
+
+    try {
+      setLoadingTeam(true);
+      const res = await fetch(
+        `/api/team-data?team=${encodeURIComponent(teamName)}`
+      );
+      if (!res.ok) throw new Error("Failed to load team data");
+      const data = await res.json();
+      setTeamData(data);
+    } catch (err) {
+      console.error("Error loading team data:", err);
+    } finally {
+      setLoadingTeam(false);
+    }
+  }
+
+  useEffect(() => {
+    if (selectedTeam) loadTeamData(selectedTeam);
+  }, [selectedTeam]);
+
   return (
-    <div className="p-6 flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="p-6 flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900  w-full">
       {/* Titulo */}
       <div className="mb-4 w-full text-center">
         <h1
@@ -17,13 +50,12 @@ export default function DashboardPage() {
         </h1>
       </div>
 
-      {/* Filtro Teams */}
       <div className="mb-6 flex justify-end">
-        <select className="block w-64 rounded-md border-gray-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-          <option>Team A</option>
-          <option>Team B</option>
-          <option>Team C</option>
-        </select>
+        <TeamMemberByManager
+          teams={teams || []}
+          selectedTeam={selectedTeam}
+          onSelect={setSelectedTeam}
+        />
       </div>
 
       {/* Resume 1 */}
