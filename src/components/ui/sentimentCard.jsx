@@ -1,0 +1,54 @@
+"use client";
+
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+} from "@/src/components/ui/card";
+import { Smile, Meh, Frown } from "lucide-react";
+
+export default function SentimentCard({ averageSentiment = "Neutral" }) {
+  const sentimentConfig = {
+    Positive: {
+      color: "bg-white text-black",
+      icon: <Smile className="w-16 h-16 text-black" />,
+      title: "Average Sentiment",
+      message: "Your team seems motivated and positive in the last 25 days!",
+    },
+    Neutral: {
+      color: "bg-white text-black",
+      icon: <Meh className="w-16 h-16 text-black" />,
+      title: "Average Sentiment",
+      message: "Your team has been balanced — keep up the steady energy!",
+    },
+    Negative: {
+      color: "bg-white text-black",
+      icon: <Frown className="w-16 h-16 text-black" />,
+      title: "Average Sentiment",
+      message: "Your team seems low in spirit lately. Try boosting morale!",
+    },
+  };
+
+  // Si no hay sentimiento, por defecto “Neutral”
+  const { color, icon, title, message } =
+    sentimentConfig[averageSentiment] || sentimentConfig.Neutral;
+
+  return (
+    <Card
+      className={`flex flex-col items-center justify-between rounded-xl shadow-lg p-4 w-full h-60 ${color}`}
+    >
+      <CardHeader className="text-center font-bold text-lg w-full">
+        {title}
+      </CardHeader>
+
+      <CardContent className="flex items-center justify-center flex-grow">
+        {icon}
+      </CardContent>
+
+      <CardFooter className="text-center text-sm px-3 w-[50%]">
+        {message}
+      </CardFooter>
+    </Card>
+  );
+}

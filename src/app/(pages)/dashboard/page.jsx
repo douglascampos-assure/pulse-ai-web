@@ -1,5 +1,7 @@
 "use client";
 import TeamMemberByManager from "@/src/components/custom/TeamMemberByManager";
+import TeamMemberCards from "@/src/components/custom/TeamMembersCards";
+import SentimentCard from "@/src/components/ui/sentimentCard";
 import SimpleCard from "@/src/components/ui/simple-card";
 import { useAuth } from "@/src/context/AuthContext";
 import { useTeamsByManager } from "@/src/hooks/useTeamsByManager";
@@ -11,6 +13,7 @@ export default function DashboardPage() {
   const { teams, loading } = useTeamsByManager(email);
   const [selectedTeam, setSelectedTeam] = useState("");
   const [LoadingTeam, setLoadingTeam] = useState(false);
+  const [teamData, setTeamData] = useState(false);
 
   async function loadTeamData(teamName) {
     if (!teamName) return;
@@ -22,6 +25,7 @@ export default function DashboardPage() {
       );
       if (!res.ok) throw new Error("Failed to load team data");
       const data = await res.json();
+      console.log(data);
       setTeamData(data);
     } catch (err) {
       console.error("Error loading team data:", err);
@@ -66,7 +70,7 @@ export default function DashboardPage() {
             textColor="text-black"
             width="w-44"
             height="h-44"
-            indicator="4"
+            indicator={(teams?.length ?? 0).toString()}
             description="Teams"
           />
 
@@ -94,21 +98,21 @@ export default function DashboardPage() {
         <SimpleCard
           bgColor="bg-white"
           textColor="text-black"
-          indicator="8"
+          indicator={teamData.members?.length ?? 0}
           description="Members in the team"
           icon="/icons/people.png"
         />
         <SimpleCard
           bgColor="bg-white"
           textColor="text-black"
-          indicator="24"
+          indicator={(teamData.avgWeeklyHours ?? 0).toFixed(1)}
           description="Meetings this week"
           icon="/icons/meetings.png"
         />
         <SimpleCard
           bgColor="bg-white"
           textColor="text-black"
-          indicator="500"
+          indicator={teamData.totalKudos}
           description="Mentions on Slack"
           icon="/icons/slack.png"
         />
@@ -125,16 +129,18 @@ export default function DashboardPage() {
         <div className="py-6 rounded-xl grid grid-cols-1 md:grid-cols-2 gap-6 bg-white">
           aa
         </div>
-        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col justify-center items-center">
-          <SimpleCard
-            bgColor="bg-[#C4E7FF]"
-            textColor="text-black"
-            width="w-64"
-            height="h-44"
-            indicator="92%"
-            description="Engagement Rate"
-          />
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-row justify-center items-center">
+          <div flex flex-col>
+            <div>Warnings 1</div>
+            <div>Warnings 2</div>
+          </div>
+          <SentimentCard averageSentiment={teamData.averageSentiment} />
         </div>
+      </div>
+      {/* Table */}
+      <div className="py-6 rounded-xl bg-white p-6">
+        <h2 className="text-lg font-semibold mb-4">Team Members Details</h2>
+        <TeamMemberCards members={teamData.members || []} />
       </div>
     </div>
   );
