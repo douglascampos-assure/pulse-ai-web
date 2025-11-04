@@ -92,11 +92,11 @@ export default function SkillsOverviewChart({ team = "", employee = "", startDat
                   <div className="flex items-center space-x-2">
                     <div className="text-sm font-medium truncate">{row.Skill_to_Improve}</div>
                     {isTop && <Badge label="Top" color={COLORS.positive} bg="#E6F6EA" />}
-                    {isWorst && <Badge label="Needs work" color={COLORS.negative} bg="#FDE8E8" />}
+                    {isWorst && <Badge label="Needs improvement" color={COLORS.negative} bg="#FDE8E8" />}
                   </div>
 
                   <div className="text-xs text-gray-500 whitespace-nowrap ml-2">
-                    {row.times_mentioned} menciones • Avg Match {row.avg_score ?? "N/A"}%
+                    {row.times_mentioned} mentions • Avg Match {row.avg_score ?? "N/A"}%
                   </div>
                 </div>
 
