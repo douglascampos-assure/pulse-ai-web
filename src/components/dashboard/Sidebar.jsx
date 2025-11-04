@@ -13,10 +13,9 @@ const links = [
   { href: "/dashboard", label: "Overview", icon: Home },
   { href: "/dashboard/slack", label: "Slack Analytics", icon: SiSlack },
   { href: "/dashboard/meetings", label: "Meetings", icon: BarChart3 },
-  { href: "/dashboard/jira", label: "Jira Tracking", icon: SiJira },
-  { href: "/dashboard/calendar", label: "Github Tracking", icon: SiGithub },
   { href: "/dashboard/feedbacks", label: "Feedbacks", icon: MessageCircle },
-  { href: "/dashboard/teams", label: "Teams", icon: Users },
+  { href: "/dashboard/jira", label: "Jira Tracking", icon: SiJira },
+  { href: "/dashboard/github", label: "Github Tracking", icon: SiGithub }
 ];
 
 function SidebarContent() {
