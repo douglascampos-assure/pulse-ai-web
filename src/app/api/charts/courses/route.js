@@ -19,19 +19,25 @@ export async function GET(req) {
 
     const sql = `
       SELECT
-        Skill_to_Improve,
-        Recommended_Course,
-        COUNT(*) AS times_recommended,
-        AVG(Match_Score) AS avg_score
+          Recommended_Course,
+          COUNT(*) AS times_recommended, 
+          AVG(Match_Score) AS avg_score,
+          COLLECT_SET(Skill_to_Improve) AS Skills_Improved_List 
       FROM ${catalog}.${schema}.feedback_enriched
       ${whereSQL}
-      GROUP BY Recommended_Course, Skill_to_Improve
+      GROUP BY Recommended_Course
+      HAVING COUNT(*) > 0
       ORDER BY times_recommended DESC
       LIMIT ${limit}
     `;
 
     const result = await queryDatabricks(sql);
-    return NextResponse.json(result);
+    const res = result.map(row => ({
+      ...row,
+      Skill_to_Improve: row.Skills_Improved_List,
+      avg_score: Math.round(row.avg_score)
+    }));
+    return NextResponse.json(res);
   } catch (error) {
     console.error("Error fetching courses data:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

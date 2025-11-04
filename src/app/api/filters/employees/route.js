@@ -9,7 +9,7 @@ export async function GET(req) {
     const catalog = process.env.DATABRICKS_CATALOG;
     const schema = "gold";
 
-    let whereClauses = ["employee_id IS NOT NULL", "displayName IS NOT NULL"];
+    let whereClauses = ["Employee_Id IS NOT NULL", "Employee IS NOT NULL"];
     if (team) {
       whereClauses.push(`Team = '${team}'`);
     }
@@ -17,17 +17,17 @@ export async function GET(req) {
     const whereSQL = `WHERE ${whereClauses.join(" AND ")}`;
 
     const sql = `
-      SELECT DISTINCT employee_id, displayName
+      SELECT DISTINCT Employee_Id, Employee
       FROM ${catalog}.${schema}.feedback_enriched
       ${whereSQL}
-      ORDER BY displayName ASC
+      ORDER BY Employee ASC
     `;
 
     const result = await queryDatabricks(sql);
 
     const employees = result.map(row => ({
-      id: row.employee_id,
-      displayName: row.displayName
+      id: row.Employee_Id,
+      displayName: row.Employee
     }));
 
     return NextResponse.json(employees);

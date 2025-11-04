@@ -16,7 +16,7 @@ export async function GET(req) {
     const supervisor = searchParams.get("supervisor")
     let sql = `
       SELECT *
-      FROM ${catalog}.${schema}.${GOLD_SLACK_TABLE}
+      FROM ${catalog}.gold.${GOLD_SLACK_TABLE}
       WHERE type_congratulation is not NULL
     `;
     if (employeeId) {

@@ -66,7 +66,7 @@ const FeedbacksPage = () => {
 
       const [trendRes, coursesRes] = await Promise.all([
         fetch(`/api/charts/sentiment-trend?${params.toString()}`),
-        fetch(`/api/charts/courses?${params.toString()}&limit=4`),
+        fetch(`/api/charts/courses?${params.toString()}&limit=8`),
       ]);
 
       const trendData = await trendRes.json();

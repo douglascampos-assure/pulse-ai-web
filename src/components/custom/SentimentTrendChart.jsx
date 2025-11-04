@@ -133,7 +133,7 @@ export const SentimentTrendChart = ({ chartData, isEmployeeView = false, rolling
       <CardHeader>
         <CardTitle>Feedback Sentiment Trend Over Time</CardTitle>
         <CardDescription>
-          Sentiment evolution (rolling {rollingWindow} days).
+          Sentiment evolution.
         </CardDescription>
       </CardHeader>
       <CardContent className="h-[400px]">
