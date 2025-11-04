@@ -28,7 +28,7 @@ export const RecommendedCoursesCards = ({ coursesData }) => {
                         </CardHeader>
                         <CardContent className="space-y-2 pt-2">
                             <div className="flex items-center space-x-2">
-                                <span className="text-sm text-gray-500">Recommended:</span>
+                                <span className="text-sm text-gray-500">Average Match:</span>
                                 <span className={`text-2xl font-bold ${getColor(course.avg_score)}`}>
                                     {course.avg_score}%
                                 </span>
@@ -37,9 +37,9 @@ export const RecommendedCoursesCards = ({ coursesData }) => {
                             <div className="flex items-start space-x-2 text-sm text-gray-700">
                                 <Target className="h-4 w-4 flex-shrink-0 mt-0.5 text-gray-400" />
                                 <span className="font-medium">Skill:</span>
-                                <span className="line-clamp-1">{course.Skill_to_Improve || "Not Specified"}</span>
+                                <span className="line-clamp-2">{course.Skill_to_Improve.join(", ") || "Not Specified"}</span>
                             </div>
-                             <p className="text-xs text-gray-400 mt-2">(Total recommendations: {course.times_recommended})</p>
+                             <p className="font-medium text-blue-900 mt-2">Total recommendations: {course.times_recommended}</p>
                         </CardContent>
                     </Card>
                 ))}

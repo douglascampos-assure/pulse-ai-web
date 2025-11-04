@@ -17,9 +17,7 @@ export default function SkillsOverviewChart({ team = "", employee = "", startDat
       setData([]);
       return;
     }
-
     const controller = new AbortController();
-
     (async () => {
       try {
         setLoading(true);
@@ -28,7 +26,6 @@ export default function SkillsOverviewChart({ team = "", employee = "", startDat
         if (employee) params.append("employee", employee);
         if (startDate) params.append("startDate", startDate);
         if (endDate) params.append("endDate", endDate);
-
         const res = await fetch(`/api/charts/skills-overview?${params.toString()}`, { signal: controller.signal });
         const json = await res.json();
         setData(Array.isArray(json) ? json : []);
@@ -38,36 +35,44 @@ export default function SkillsOverviewChart({ team = "", employee = "", startDat
         setLoading(false);
       }
     })();
-
     return () => controller.abort();
   }, [team, employee, startDate, endDate]);
 
-  const { sortedByCount, sortedByAvgScoreAsc, maxCount, top3Names, worst3Names } = useMemo(() => {
+  const { processedData, maxCount, top3Names, skillsWithNegative } = useMemo(() => {
     if (!Array.isArray(data) || data.length === 0) {
-      return { sortedByCount: [], sortedByAvgScoreAsc: [], maxCount: 1, top3Names: [], worst3Names: [] };
+      return { processedData: [], maxCount: 1, top3Names: [], skillsWithNegative: [] };
     }
 
     const sortedByCount = [...data].sort((a, b) => b.times_mentioned - a.times_mentioned);
-    const sortedByAvgScoreAsc = [...data].sort((a, b) => (a.avg_score || 0) - (b.avg_score || 0));
     const top3Names = sortedByCount.slice(0, 3).map((d) => d.Skill_to_Improve);
-    const worst3Names = sortedByAvgScoreAsc.slice(0, 3).map((d) => d.Skill_to_Improve);
+    const skillsWithNegative = data
+      .filter((d) => d.has_negative_sentiment === 1)
+      .map((d) => d.Skill_to_Improve);
+      
     const maxCount = Math.max(...data.map((d) => d.times_mentioned), 1);
 
-    return { sortedByCount, sortedByAvgScoreAsc, maxCount, top3Names, worst3Names };
+    // Lógica para mostrar max 6: Top 3 + los siguientes con sentimiento negativo
+    const top3ByCount = sortedByCount.slice(0, 3);
+    const othersWithNegative = sortedByCount
+      .slice(3) // Empezar después del top 3
+      .filter(d => d.has_negative_sentiment === 1);
+
+    const processedData = [...top3ByCount, ...othersWithNegative].slice(0, 6);
+
+    return { processedData, maxCount, top3Names, skillsWithNegative };
   }, [data]);
 
   const getColorForSkill = (skillName) => {
+    // Prioritizar negativo
+    if (skillsWithNegative.includes(skillName)) return COLORS.negative;
     if (top3Names.includes(skillName)) return COLORS.positive;
-    if (worst3Names.includes(skillName)) return COLORS.negative;
     return COLORS.neutral;
   };
 
   if (!team && !employee)
-    return <div className="p-4 text-sm text-gray-500">Select a team o employee.</div>;
-
+    return <div className="p-4 text-sm text-gray-500">Select a team or employee.</div>;
   if (loading)
     return <div className="p-4 text-sm text-gray-500">Loading skills...</div>;
-
   if (!data || data.length === 0)
     return <div className="p-4 text-sm text-gray-500">There is no skills data to display.</div>;
 
@@ -77,13 +82,13 @@ export default function SkillsOverviewChart({ team = "", employee = "", startDat
         <h3 className="text-xl font-semibold">Skills Overview — Strengths & Improvement Areas</h3>
         <div className="text-sm text-gray-500">Metrics based on feedback count and average match score</div>
       </div>
-
       <div className="space-y-3">
-        {sortedByCount.map((row) => {
+        {/* Iterar sobre processedData en lugar de sortedByCount */}
+        {processedData.map((row) => {
           const pct = Math.round((row.times_mentioned / maxCount) * 100);
           const color = getColorForSkill(row.Skill_to_Improve);
           const isTop = top3Names.includes(row.Skill_to_Improve);
-          const isWorst = worst3Names.includes(row.Skill_to_Improve);
+          const isNegative = skillsWithNegative.includes(row.Skill_to_Improve);
 
           return (
             <div key={row.Skill_to_Improve} className="flex flex-col md:flex-row md:items-center md:space-x-4">
@@ -92,14 +97,13 @@ export default function SkillsOverviewChart({ team = "", employee = "", startDat
                   <div className="flex items-center space-x-2">
                     <div className="text-sm font-medium truncate">{row.Skill_to_Improve}</div>
                     {isTop && <Badge label="Top" color={COLORS.positive} bg="#E6F6EA" />}
-                    {isWorst && <Badge label="Needs improvement" color={COLORS.negative} bg="#FDE8E8" />}
+                    {/* Usar isNegative para la insignia de "Needs improvement" */}
+                    {isNegative && <Badge label="Needs improvement" color={COLORS.negative} bg="#FDE8E8" />}
                   </div>
-
                   <div className="text-xs text-gray-500 whitespace-nowrap ml-2">
                     {row.times_mentioned} mentions • Avg Match {row.avg_score ?? "N/A"}%
                   </div>
                 </div>
-
                 <div className="mt-2 h-3 rounded-md" style={{ backgroundColor: COLORS.track }}>
                   <div
                     role="progressbar"
@@ -116,7 +120,6 @@ export default function SkillsOverviewChart({ team = "", employee = "", startDat
                   />
                 </div>
               </div>
-
               <div className="w-16 flex-shrink-0 text-right mt-2 md:mt-0">
                 <div className="text-sm font-medium">{pct}%</div>
                 <div className="text-xs text-gray-400">relative</div>
@@ -125,11 +128,11 @@ export default function SkillsOverviewChart({ team = "", employee = "", startDat
           );
         })}
       </div>
-
       <div className="flex items-center space-x-4 pt-2">
         <Legend color={COLORS.positive} label="Top 3 most mentioned" />
         <Legend color={COLORS.neutral} label="Others" />
-        <Legend color={COLORS.negative} label="Bottom 3 below average match score" />
+        {/* Actualizar la leyenda */}
+        <Legend color={COLORS.negative} label="Has negative feedback" />
       </div>
     </div>
   );

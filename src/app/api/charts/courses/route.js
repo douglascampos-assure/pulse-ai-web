@@ -37,6 +37,7 @@ export async function GET(req) {
       Skill_to_Improve: row.Skills_Improved_List,
       avg_score: Math.round(row.avg_score)
     }));
+    console.log("Courses Data Response:", res);
     return NextResponse.json(res);
   } catch (error) {
     console.error("Error fetching courses data:", error);

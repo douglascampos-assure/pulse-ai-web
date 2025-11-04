@@ -23,6 +23,9 @@ const FeedbacksPage = () => {
         const res = await fetch('/api/filters/teams');
         const data = await res.json();
         setTeams(data);
+        if (Array.isArray(data) && data.length > 0) {
+          setSelectedTeam(data[0]);
+        }
       } catch (error) {
         console.error("Error fetching teams list:", error);
       }
