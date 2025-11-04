@@ -46,7 +46,7 @@ export default function SentimentCard({ averageSentiment = "Neutral" }) {
         {icon}
       </CardContent>
 
-      <CardFooter className="text-center text-sm px-3 w-[50%]">
+      <CardFooter className="text-center text-sm px-3 w-[80%]">
         {message}
       </CardFooter>
     </Card>

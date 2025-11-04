@@ -1,7 +1,6 @@
 "use client";
 
 export default function TeamMemberCards({ members = [] }) {
-  console.log(members);
   if (!members || members.length === 0) {
     return (
       <div className="bg-white rounded-xl shadow-sm p-6 text-center text-slate-500">

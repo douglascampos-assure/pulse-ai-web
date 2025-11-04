@@ -25,17 +25,14 @@ export default function Sidebar() {
   const { user, logout } = useAuth();
 
   const [profile, setProfile] = useState(null);
-  console.log(user);
 
   useEffect(() => {
-    console.log("aaa...", user);
     if (!user?.email) return;
 
     const fetchProfile = async () => {
       try {
         const res = await fetch(`/api/profile?email=${user.email}`);
         const data = await res.json();
-        console.log(data);
         setProfile(data);
       } catch (err) {
         console.error("Error fetching profile:", err);

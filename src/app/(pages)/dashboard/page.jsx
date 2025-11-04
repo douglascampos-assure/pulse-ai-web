@@ -3,6 +3,7 @@ import TeamMemberByManager from "@/src/components/custom/TeamMemberByManager";
 import TeamMemberCards from "@/src/components/custom/TeamMembersCards";
 import SentimentCard from "@/src/components/ui/sentimentCard";
 import SimpleCard from "@/src/components/ui/simple-card";
+import { LinePerformanceChart } from "@/src/components/charts/line-chart";
 import { useAuth } from "@/src/context/AuthContext";
 import { useTeamsByManager } from "@/src/hooks/useTeamsByManager";
 import { useState, useEffect } from "react";
@@ -14,6 +15,13 @@ export default function DashboardPage() {
   const [selectedTeam, setSelectedTeam] = useState("");
   const [LoadingTeam, setLoadingTeam] = useState(false);
   const [teamData, setTeamData] = useState(false);
+
+  const performanceData = [
+    { month: "Jul", performance: 72 },
+    { month: "Aug", performance: 80 },
+    { month: "Sep", performance: 77 },
+    { month: "Oct", performance: 90 },
+  ];
 
   async function loadTeamData(teamName) {
     if (!teamName) return;
@@ -119,20 +127,54 @@ export default function DashboardPage() {
         <SimpleCard
           bgColor="bg-white"
           textColor="text-black"
-          indicator=""
+          indicator={teamData.totalCompleted}
           description="Completed Tasks"
           icon="/icons/jira.svg"
         />
       </div>
       {/* Resume 3 */}
-      <div className="py-6 rounded-xl grid grid-cols-2 gap-6 bg-white">
-        <div className="py-6 rounded-xl grid grid-cols-1 md:grid-cols-2 gap-6 bg-white">
-          aa
+      <div className="py-6 rounded-xl grid grid-cols-2 gap-6 bg-white my-6">
+        <div className="rounded-xl bg-white shadow-lg p-6 h-[280px]">
+          <div className="h-full w-full">
+            <LinePerformanceChart
+              title="Team Performance"
+              description="Jira story points by month"
+              chartData={performanceData}
+              chartConfig={{
+                dataKey: "performance",
+                xKey: "month",
+                color: "var(--chart-3)",
+                label: "Performance",
+              }}
+            />
+          </div>
         </div>
-        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-row justify-center items-center">
-          <div flex flex-col>
-            <div>Warnings 1</div>
-            <div>Warnings 2</div>
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-row justify-center items-stretch">
+          {/* Columna izquierda: warnings */}
+          <div className="flex flex-col justify-between w-1/2 gap-2 pr-5">
+            {teamData.warnings && teamData.warnings.length > 0 ? (
+              teamData.warnings.map((w, i) => (
+                <div
+                  key={i}
+                  className={`flex items-center justify-center text-xs font-medium rounded-xl shadow-md p-4 h-1/2
+            ${
+              w.type === "negative"
+                ? "bg-red-300 text-black"
+                : w.type === "alert"
+                ? "bg-yellow-200 text-black"
+                : w.type === "positive"
+                ? "bg-green-200 text-black"
+                : "bg-gray-200 text-black"
+            }`}
+                >
+                  <span>{w.message}</span>
+                </div>
+              ))
+            ) : (
+              <div className="flex flex-col justify-center items-center h-full text-gray-500">
+                <span>No warnings</span>
+              </div>
+            )}
           </div>
           <SentimentCard averageSentiment={teamData.averageSentiment} />
         </div>

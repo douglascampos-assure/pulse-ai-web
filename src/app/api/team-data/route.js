@@ -5,6 +5,9 @@ export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const teamName = searchParams.get("team");
+
+    console.log(teamName);
+
     if (!teamName) {
       return NextResponse.json(
         { error: "Team name required" },
@@ -16,7 +19,7 @@ export async function GET(req) {
     const schema = process.env.DATABRICKS_SCHEMA_BRONZE;
     const schema_gold = process.env.DATABRICKS_SCHEMA_GOLD;
 
-    // 1️⃣ Miembros
+    // 1️⃣ Miembros del equipo
     const membersResult = await queryDatabricks(`
       SELECT WorkEmail, FirstName, LastName, Department, Lead, Role
       FROM ${catalog}.${schema}.google_sheets_employees
@@ -27,12 +30,72 @@ export async function GET(req) {
     const members = membersResult || [];
     const emails = members.map((m) => m.WorkEmail);
     if (emails.length === 0) {
-      return NextResponse.json({ members: [], kudos: [] });
+      return NextResponse.json({ members: [], performance: {} });
     }
 
     const emailsList = emails.map((e) => `'${e}'`).join(", ");
 
-    // 2️⃣ Kudos
+    const likeConditions = members.map(
+      (m) => `LOWER(assignee) LIKE LOWER('%${m.FirstName}%${m.LastName}%')`
+    );
+    const whereClause = likeConditions.join(" OR ");
+    console.log(members);
+
+    // 2️⃣ Jira data (últimos 3 meses)
+    const jiraResult = await queryDatabricks(`
+      SELECT 
+        assignee,
+        status,
+        created_at,
+        story_points,
+        key AS issue_key,
+        summary
+      FROM ${catalog}.${schema}.jira_issues
+      WHERE (${whereClause})
+        AND created_at >= date_add(current_date(), -90)
+    `);
+
+    // Mapa por persona
+    const jiraMap = {};
+    jiraResult.forEach((row) => {
+      const email = row.assignee?.toLowerCase();
+      if (!email) return;
+      if (!jiraMap[email]) {
+        jiraMap[email] = {
+          assigned: 0,
+          completed: 0,
+          storyPointsTotal: 0,
+          storyPointsCompleted: 0,
+        };
+      }
+      jiraMap[email].assigned += 1;
+      const sp = Number(row.story_points) || 0;
+      jiraMap[email].storyPointsTotal += sp;
+      if (["Done", "READY FOR QA", "Closed"].includes(row.status)) {
+        jiraMap[email].completed += 1;
+        jiraMap[email].storyPointsCompleted += sp;
+      }
+    });
+
+    // Totales del equipo
+    const totalAssigned = Object.values(jiraMap).reduce(
+      (s, m) => s + m.assigned,
+      0
+    );
+    const totalCompleted = Object.values(jiraMap).reduce(
+      (s, m) => s + m.completed,
+      0
+    );
+    const totalStoryPoints = Object.values(jiraMap).reduce(
+      (s, m) => s + m.storyPointsTotal,
+      0
+    );
+    const completedStoryPoints = Object.values(jiraMap).reduce(
+      (s, m) => s + m.storyPointsCompleted,
+      0
+    );
+
+    // 3️⃣ Kudos
     const kudosResult = await queryDatabricks(`
       SELECT workEmail
       FROM ${catalog}.${schema_gold}.slack_kudos_enriched
@@ -45,12 +108,12 @@ export async function GET(req) {
       return acc;
     }, {});
 
-    // 3️⃣ Horas semanales
+    // 4️⃣ Horas semanales
     const weeklyResult = await queryDatabricks(`
       SELECT owner_email, week, total_horas
       FROM ${catalog}.${schema_gold}.calendar_gold_weekly
       WHERE owner_email IN (${emailsList})
-          AND week = WEEKOFYEAR(current_date())
+        AND week = WEEKOFYEAR(current_date())
     `);
 
     const weeklyHoursMap = weeklyResult.reduce((acc, row) => {
@@ -63,21 +126,21 @@ export async function GET(req) {
       (sum, row) => sum + (row.total_horas || 0),
       0
     );
+
     const avgWeeklyHours =
       members.length > 0 ? totalWeeklyHours / members.length : 0;
 
-    // 4️⃣ Sentiment (nuevo)
+    // 5️⃣ Sentiment (feedback)
     const sentimentResult = await queryDatabricks(`
-    SELECT Email AS workEmail, Sentiment
-    FROM ${catalog}.${schema_gold}.feedback_enriched
-    WHERE Email IN (${emailsList})
+      SELECT Email AS workEmail, Sentiment
+      FROM ${catalog}.${schema_gold}.feedback_enriched
+      WHERE Email IN (${emailsList})
         AND Sentiment IS NOT NULL
     `);
 
     const sentimentMap = sentimentResult.reduce((acc, row) => {
       const email = row.workEmail?.toLowerCase();
       if (!email) return acc;
-
       if (!acc[email]) acc[email] = { total: 0, count: 0 };
 
       let score = 0;
@@ -89,9 +152,11 @@ export async function GET(req) {
       return acc;
     }, {});
 
-    // 5️⃣ Enriquecer miembros
+    // 6️⃣ Enriquecer miembros
     const enrichedMembers = members.map((m) => {
       const email = m.WorkEmail?.toLowerCase();
+
+      // Sentiment promedio
       const sentimentData = sentimentMap[email];
       const sentimentScore =
         sentimentData && sentimentData.count > 0
@@ -102,21 +167,32 @@ export async function GET(req) {
       if (sentimentScore > 0.2) sentimentLabel = "Positive";
       else if (sentimentScore < -0.2) sentimentLabel = "Negative";
 
+      // Jira performance
+      const jiraStats = jiraMap[email] || {
+        assigned: 0,
+        completed: 0,
+        storyPointsTotal: 0,
+        storyPointsCompleted: 0,
+      };
+
       return {
         ...m,
         kudosCount: kudosCountMap[email] || 0,
         weeklyHours: weeklyHoursMap[email] || 0,
         sentimentScore,
         sentimentLabel,
+        jiraAssigned: jiraStats.assigned,
+        jiraCompleted: jiraStats.completed,
+        storyPointsTotal: jiraStats.storyPointsTotal,
+        storyPointsCompleted: jiraStats.storyPointsCompleted,
       };
     });
 
-    // 6️⃣ Totales
+    // 7️⃣ Totales del equipo
     const totalKudos = enrichedMembers.reduce(
       (sum, m) => sum + (m.kudosCount || 0),
       0
     );
-
     const avgSentimentScore =
       enrichedMembers.reduce((sum, m) => sum + m.sentimentScore, 0) /
       (enrichedMembers.length || 1);
@@ -128,12 +204,24 @@ export async function GET(req) {
     // ✅ Respuesta final
     return NextResponse.json({
       team: teamName,
+      range: "last_3_months",
       totalKudos,
       totalWeeklyHours,
       avgWeeklyHours,
       avgSentimentScore,
       avgSentimentLabel,
+      totalAssigned,
+      totalCompleted,
+      totalStoryPoints,
+      completedStoryPoints,
       members: enrichedMembers,
+      warnings: [
+        {
+          message: "Team Phoenix: Average sentiment is Negative",
+          type: "negative",
+        },
+        { message: "1 member has camera on <85%", type: "alert" },
+      ],
     });
   } catch (error) {
     console.error("Error fetching team data:", error);
