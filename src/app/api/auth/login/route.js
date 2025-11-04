@@ -21,7 +21,7 @@ export async function POST(req) {
 
     const result = await queryDatabricks(`
       SELECT * FROM ${catalog}.${schema}.${table} 
-      WHERE email = '${email}' LIMIT 1
+      WHERE user_email = '${email}' LIMIT 1
     `);
 
     if (result.length === 0) {
@@ -32,7 +32,8 @@ export async function POST(req) {
     }
 
     const user = result[0];
-    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    const passwordMatch = password === user.password;//await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
       return NextResponse.json(
@@ -44,7 +45,7 @@ export async function POST(req) {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const alg = "HS256";
 
-    const token = await new SignJWT({ email: user.email, userId: user.id })
+    const token = await new SignJWT({ email: user.user_email, userId: user.id, type: user.user_type })
       .setProtectedHeader({ alg })
       .setExpirationTime("2h")
       .setIssuedAt()
