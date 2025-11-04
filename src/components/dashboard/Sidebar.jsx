@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Home, Users, BarChart3, Calendar, MessageCircle } from "lucide-react";
@@ -18,7 +19,7 @@ const links = [
   { href: "/dashboard/teams", label: "Teams", icon: Users },
 ];
 
-export default function Sidebar() {
+function SidebarContent() {
   const searchParams = useSearchParams();
   const showToogle = searchParams.get("dark") === "true";
   const pathname = usePathname();
@@ -41,9 +42,10 @@ export default function Sidebar() {
 
     fetchProfile();
   }, [user?.email]);
+
   return (
     <aside className="w-64 bg-primary text-gray-200 flex flex-col border-r border-gray-800 min-h-[100dvh]">
-      {/* Logo - Logo Assuresoft?*/}
+      {/* Logo */}
       <div className="h-16 flex items-center justify-center border-b border-gray-800 gap-4">
         <span className="text-lg font-bold tracking-wide text-white">
           Pulse<span className="text-blue-400">AI</span>
@@ -60,13 +62,10 @@ export default function Sidebar() {
               className="w-full h-full object-cover"
             />
           </div>
-          <p className="text-xs text-gray-400">
-            {user.email || "user@email.com"}
-          </p>
+          <p className="text-xs text-gray-400">{user.email}</p>
         </div>
       )}
 
-      {/* Links */}
       <nav className="flex-1 px-3 py-4 space-y-1">
         {links.map(({ href, label, icon: Icon }) => {
           const active = pathname === href;
@@ -89,7 +88,6 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Footer / logout */}
       <div className="border-t border-gray-800 p-4 text-sm">
         <button
           onClick={logout}
@@ -99,5 +97,15 @@ export default function Sidebar() {
         </button>
       </div>
     </aside>
+  );
+}
+
+export default function Sidebar() {
+  return (
+    <Suspense
+      fallback={<div className="w-64 h-full bg-gray-900 animate-pulse" />}
+    >
+      <SidebarContent />
+    </Suspense>
   );
 }
