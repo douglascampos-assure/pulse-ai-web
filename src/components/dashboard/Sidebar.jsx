@@ -1,11 +1,13 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Home, Users, BarChart3, Calendar, MessageCircle } from "lucide-react";
 import { SiSlack, SiJira, SiGithub } from "react-icons/si";
 import { useAuth } from "@/src/context/AuthContext";
-import { ModeToggle } from "@/src/components/general/mode-toggle"
+import { ModeToggle } from "@/src/components/general/mode-toggle";
+import { useState, useEffect } from "react";
 
 const links = [
   { href: "/dashboard", label: "Overview", icon: Home },
@@ -17,15 +19,33 @@ const links = [
   { href: "/dashboard/teams", label: "Teams", icon: Users },
 ];
 
-export default function Sidebar() {
+function SidebarContent() {
   const searchParams = useSearchParams();
-  const showToogle = searchParams.get('dark') === 'true';
+  const showToogle = searchParams.get("dark") === "true";
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    if (!user?.email) return;
+
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(`/api/profile?email=${user.email}`);
+        const data = await res.json();
+        setProfile(data);
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      }
+    };
+
+    fetchProfile();
+  }, [user?.email]);
+
   return (
-    <aside className="w-64 bg-primary text-gray-200 flex flex-col border-r border-gray-800">
-      {/* Logo - Logo Assuresoft?*/}
+    <aside className="w-64 bg-primary text-gray-200 flex flex-col border-r border-gray-800 min-h-[100dvh]">
+      {/* Logo */}
       <div className="h-16 flex items-center justify-center border-b border-gray-800 gap-4">
         <span className="text-lg font-bold tracking-wide text-white">
           Pulse<span className="text-blue-400">AI</span>
@@ -37,18 +57,15 @@ export default function Sidebar() {
         <div className="flex flex-col items-center py-4 border-b border-gray-800 text-center space-y-4">
           <div className="flex-none w-16 h-16 rounded-full bg-blue-500 overflow-hidden border border-gray-500 mb-3">
             <img
-              src={user?.image || "/images/test-avatar.jpg"}
-              alt={user?.user_email || "User avatar"}
+              src={profile?.photoUrl || "/images/test-avatar.jpg"}
+              alt={user?.email || "User avatar"}
               className="w-full h-full object-cover"
             />
           </div>
-          <p className="text-xs text-gray-400">
-            {user.user_email || "user@email.com"}
-          </p>
+          <p className="text-xs text-gray-400">{user.email}</p>
         </div>
       )}
 
-      {/* Links */}
       <nav className="flex-1 px-3 py-4 space-y-1">
         {links.map(({ href, label, icon: Icon }) => {
           const active = pathname === href;
@@ -71,7 +88,6 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Footer / logout */}
       <div className="border-t border-gray-800 p-4 text-sm">
         <button
           onClick={logout}
@@ -81,5 +97,15 @@ export default function Sidebar() {
         </button>
       </div>
     </aside>
+  );
+}
+
+export default function Sidebar() {
+  return (
+    <Suspense
+      fallback={<div className="w-64 h-full bg-gray-900 animate-pulse" />}
+    >
+      <SidebarContent />
+    </Suspense>
   );
 }
