@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Home, Users, BarChart3, Calendar, MessageCircle } from "lucide-react";
-import { SiSlack, SiJira } from "react-icons/si";
+import { SiSlack, SiJira, SiGithub } from "react-icons/si";
 import { useAuth } from "@/src/context/AuthContext";
 import { ModeToggle } from "@/src/components/general/mode-toggle"
 
@@ -12,7 +12,7 @@ const links = [
   { href: "/dashboard/slack", label: "Slack Analytics", icon: SiSlack },
   { href: "/dashboard/meetings", label: "Meetings", icon: BarChart3 },
   { href: "/dashboard/jira", label: "Jira Tracking", icon: SiJira },
-  { href: "/dashboard/calendar", label: "Calendar", icon: Calendar },
+  { href: "/dashboard/calendar", label: "Github Tracking", icon: SiGithub },
   { href: "/dashboard/feedbacks", label: "Feedbacks", icon: MessageCircle },
   { href: "/dashboard/teams", label: "Teams", icon: Users },
 ];
