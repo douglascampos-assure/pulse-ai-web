@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Home, Users, BarChart3, Calendar, MessageCircle } from "lucide-react";
-import { SiSlack, SiJira } from "react-icons/si";
+import { SiSlack, SiJira, SiGithub } from "react-icons/si";
 import { useAuth } from "@/src/context/AuthContext";
 import { ModeToggle } from "@/src/components/general/mode-toggle"
 
@@ -15,6 +15,7 @@ const links = [
   { href: "/dashboard/calendar", label: "Calendar", icon: Calendar },
   { href: "/dashboard/feedbacks", label: "Feedbacks", icon: MessageCircle },
   { href: "/dashboard/teams", label: "Teams", icon: Users },
+  { href: "/dashboard/github", label: "Github Analytics", icon: SiGithub },
 ];
 
 export default function Sidebar() {
