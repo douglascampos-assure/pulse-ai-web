@@ -8,7 +8,7 @@ export async function GET() {
   try {
     let sql = `
       SELECT DISTINCT displayName, employee_id
-      FROM ${catalog}.${schema}.${GOLD_SLACK_TABLE}
+      FROM ${catalog}.gold.${GOLD_SLACK_TABLE}
       WHERE type_congratulation is not NULL
     `;
     const result = await queryDatabricks(sql);

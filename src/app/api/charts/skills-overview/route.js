@@ -9,12 +9,10 @@ export async function GET(req) {
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
     const limit = parseInt(searchParams.get("limit") || "1000", 10);
-
     const catalog = process.env.DATABRICKS_CATALOG;
     const schema = "gold";
 
     const whereClauses = [`COALESCE(TRIM(Skill_to_Improve), '') <> ''`];
-
     if (team) whereClauses.push(`Team = '${team.replace(/'/g, "''")}'`);
     if (employee) whereClauses.push(`employee_id = '${employee.replace(/'/g, "''")}'`);
     if (startDate) whereClauses.push(`feedback_date >= '${startDate}'`);
@@ -26,7 +24,8 @@ export async function GET(req) {
       SELECT
         COALESCE(NULLIF(TRIM(Skill_to_Improve), ''), 'Not Specified') AS Skill_to_Improve,
         COUNT(*) AS times_mentioned,
-        ROUND(AVG(CASE WHEN Match_Score IS NULL THEN 0 ELSE Match_Score END), 1) AS avg_score
+        ROUND(AVG(CASE WHEN Match_Score IS NULL THEN 0 ELSE Match_Score END), 1) AS avg_score,
+        MAX(CASE WHEN Sentiment = 'Negative' THEN 1 ELSE 0 END) AS has_negative_sentiment
       FROM ${catalog}.${schema}.feedback_enriched
       ${whereSQL}
       GROUP BY Skill_to_Improve
