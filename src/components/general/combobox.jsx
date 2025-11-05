@@ -58,7 +58,7 @@ export function ComboBox({
         </Label>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <Button variant="ghost" className={buttonClasses}>
+            <Button id={labelCleaned} variant="ghost" className={buttonClasses}>
               {selectedInner ? selectedInner.label : `Select ${label}...`}
               <ChevronDownIcon className="h-3.5 w-3.5 text-slate-500 ml-1" />
             </Button>
@@ -128,11 +128,11 @@ function ItemsList({ items, label, setOpen, selected, setSelected }) {
         <CommandGroup>
           {items.map((item) => (
             <CommandItem
-              key={item.value}
-              value={item.value}
+              key={item.value + '|' + item.label}
+              value={item.value + '|' + item.label}
               onSelect={(value) => {
                 const clickedItem = items.find(
-                  (itemTmp) => itemTmp.value === value
+                  (itemTmp) => itemTmp.value == value.split('|')[0] && itemTmp.label === value.split('|')[1]
                 )
                 if (selected?.value === clickedItem?.value) {
                   setSelected(null)
