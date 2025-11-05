@@ -87,7 +87,7 @@ function getTotalRow(columns, rows) {
                 return sum + (isNaN(value) ? 0 : value);
             }, 0);
         } else if (type === "identifier") {
-            totalRow[field] = rows.length;
+            totalRow[field] = `Total (${rows.length})`;
         } else {
             totalRow[field] = null;
         }
