@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Zap, Target } from "lucide-react";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/src/components/ui/tooltip";
-  
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";  
 
 const getColor = (percentage) => {
     if (percentage >= 75) return "text-green-600";
