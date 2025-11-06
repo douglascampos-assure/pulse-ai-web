@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { LinePerformanceChart } from "@/src/components/charts/line-chart";
-import { LoaderWrapper } from "@/src/components/general/loader-wrapper";
 
 export const CycleTimeChart = ({ team, member, startDate, endDate, periodicity, sprints }) => {
   const [data, setData] = useState([]);
@@ -37,7 +36,7 @@ export const CycleTimeChart = ({ team, member, startDate, endDate, periodicity, 
   }, [team, member, startDate, endDate, periodicity, sprints]);
 
   if (loading) {
-    return <LoaderWrapper />;
+    return <div>Loading...</div>;
   }
 
   const chartConfig = {

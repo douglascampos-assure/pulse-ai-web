@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { BarMultiple } from "@/src/components/charts/bar-multiple";
-import { LoaderWrapper } from "@/src/components/general/loader-wrapper";
 
 export const VelocityChart = ({ team, member, sprints }) => {
   const [data, setData] = useState([]);
@@ -39,7 +38,7 @@ export const VelocityChart = ({ team, member, sprints }) => {
   }, [team, member, sprints]);
 
   if (loading) {
-    return <LoaderWrapper />;
+    return <div>Loading...</div>;
   }
 
   if (data.length === 0) {

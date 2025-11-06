@@ -104,7 +104,7 @@ export const JiraFilters = ({ onFilterChange }) => {
         >
           <option value="">All Members</option>
           {members.map((member) => (
-            <option key={member.employee_id} value={member.employee_id}>
+            <option key={`${member.employee_id}-${member.display_name}`} value={member.employee_id}>
               {member.display_name}
             </option>
           ))}
