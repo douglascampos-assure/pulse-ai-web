@@ -182,17 +182,17 @@ export default function GithubPage() {
             <div className="mx-auto aspect-square w-[40vw] h-[500px]">
               <BarLabel
                 title="Inactive Days per Developer"
-                description="Kudos"
+                description="Number of days that have passed without activity for each developer"
                 chartConfig={chartDataLabel.chartConfig}
                 chartData={chartDataLabel.chartData}
                 labelKey="label"
                 valueKey="days_since_last_activity"
               />
             </div>
-            <div className="mx-auto aspect-square w-[40vw] h-[500px]">
+            <div className="mx-auto aspect-square w-[40vw] h-[500px] max-h-[500px]">
               <BarLabelCustom
                 title="Overall Score"
-                description="Kudos"
+                description="Based on number of PRs and Commits per week, merge success rate, days without activity, level of engagement, average comments and feedback received by PR"
                 chartConfig={chartDataLabelCustom.chartConfig}
                 chartData={chartDataLabelCustom.chartData}
                 labelKey="label"
@@ -204,7 +204,7 @@ export default function GithubPage() {
             <div className="mx-auto aspect-square w-[40vw] h-[500px]">
               <BarMultiple
                 title="Pull Requests"
-                description="Kudos"
+                description="Number of pull requests by developer"
                 chartConfig={chartDataMultiple.chartConfig}
                 chartData={chartDataMultiple.chartData}
               />
@@ -212,7 +212,7 @@ export default function GithubPage() {
             <div className="mx-auto aspect-square w-[40vw] h-[500px]">
               <BarMultiple
                 title="Frequency"
-                description="Kudos"
+                description="Number of PRs and commits per week compared to overall PRs"
                 chartConfig={chartDataMultipleFrequency.chartConfig}
                 chartData={chartDataMultipleFrequency.chartData}
               />

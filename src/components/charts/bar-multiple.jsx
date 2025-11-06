@@ -1,6 +1,6 @@
 "use client"
 
-import { Bar, BarChart, CartesianGrid, XAxis, Legend } from "recharts"
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 
 import {
   Card,
@@ -70,9 +70,6 @@ export function BarMultiple({
                 />
               )
             })}
-
-            {/* Optional legend */}
-            <Legend />
           </BarChart>
         </ChartContainer>
       </CardContent>
