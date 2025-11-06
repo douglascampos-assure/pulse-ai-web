@@ -8,13 +8,19 @@ export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url)
     const developer = searchParams.get("developer")
+    const team = searchParams.get("team")
     let sql = `
       SELECT *
       FROM ${catalog}.${schema}.${GOLD_GITHUB_TABLE}
+      WHERE developer IS NOT NULL AND TRIM(developer) <> ''
     `;
     if (developer) {
-        sql += ` WHERE developer = '${developer}'`
+        sql += ` AND developer = '${developer}'`
     }
+    if (team) {
+        sql += ` AND employee_team = '${team}'`
+    }
+
     const result = await queryDatabricks(sql)
     return new Response(JSON.stringify(result || []), { status: 200 })
   } catch (error) {

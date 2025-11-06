@@ -140,7 +140,7 @@ export default function SlackPage() {
         <Card className="w-full">
           <CardContent className="flex gap-4 flex-col justify-center items-center">
             <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Slack</h3>
-            <div className="flex flex-row gap-4">
+            <div className="flex flex-wrap gap-4">
               <LoaderWrapper status={statusFilters}>
                     {supervisors.length > 1 && <ComboBox label="Supervisor" items={supervisors} setSelected={setSupervisor} />}
                     <ComboBox label="Team" items={teams} setSelected={setTeam} />
