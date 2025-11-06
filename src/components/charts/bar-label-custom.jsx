@@ -24,7 +24,7 @@ export function BarLabelCustom({
   valueKey = "overall_score"
 }) {
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col max-h-[500px]">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
