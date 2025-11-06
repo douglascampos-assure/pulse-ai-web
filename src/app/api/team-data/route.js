@@ -39,7 +39,6 @@ export async function GET(req) {
       (m) => `LOWER(assignee) LIKE LOWER('%${m.FirstName}%${m.LastName}%')`
     );
     const whereClause = likeConditions.join(" OR ");
-    console.log(members);
 
     // 2️⃣ Jira data (últimos 3 meses)
     const jiraResult = await queryDatabricks(`
@@ -97,16 +96,18 @@ export async function GET(req) {
 
     // 3️⃣ Kudos
     const kudosResult = await queryDatabricks(`
-      SELECT workEmail
+      SELECT work_email
       FROM ${catalog}.${schema_gold}.slack_kudos_enriched
-      WHERE workEmail IN (${emailsList})
+      WHERE work_email IN (${emailsList})
     `);
 
     const kudosCountMap = kudosResult.reduce((acc, k) => {
-      const email = k.workEmail?.toLowerCase();
+      const email = k.work_email?.toLowerCase();
       if (email) acc[email] = (acc[email] || 0) + 1;
       return acc;
     }, {});
+
+    console.log(kudosCountMap);
 
     // 4️⃣ Horas semanales
     const weeklyResult = await queryDatabricks(`
@@ -132,14 +133,14 @@ export async function GET(req) {
 
     // 5️⃣ Sentiment (feedback)
     const sentimentResult = await queryDatabricks(`
-      SELECT Email AS workEmail, Sentiment
+      SELECT Email AS work_email, Sentiment
       FROM ${catalog}.${schema_gold}.feedback_enriched
       WHERE Email IN (${emailsList})
         AND Sentiment IS NOT NULL
     `);
 
     const sentimentMap = sentimentResult.reduce((acc, row) => {
-      const email = row.workEmail?.toLowerCase();
+      const email = row.work_email?.toLowerCase();
       if (!email) return acc;
       if (!acc[email]) acc[email] = { total: 0, count: 0 };
 
