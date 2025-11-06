@@ -8,15 +8,18 @@ export async function GET(req) {
     const catalog = process.env.DATABRICKS_CATALOG;
     const schema = "gold";
 
-    let whereClause = "";
+    let whereClause = "WHERE employee_id IS NOT NULL";
     if (team) {
-      whereClause = `WHERE employee_team = '${team.replace(/'/g, "''")}'`;
+      whereClause += ` AND employee_team = '${team.replace(/'/g, "''")}'`;
     }
 
     const sql = `
-      SELECT DISTINCT employee_id, display_name
+      SELECT
+        employee_id,
+        MAX(display_name) AS display_name
       FROM ${catalog}.${schema}.jira_metrics
       ${whereClause}
+      GROUP BY employee_id
       ORDER BY display_name
     `;
 
