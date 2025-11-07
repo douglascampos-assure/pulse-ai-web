@@ -30,16 +30,16 @@ const colors = [
 
 function prepareChartDataLabel(data) {
   const chartData = data.map((item, idx) => ({
-    text: toSnakeCase(item.developer),
-    label: item.developer,
+    text: toSnakeCase(item.display_name),
+    label: item.display_name,
     days_since_last_activity: item.days_since_last_activity,
     fill: colors[idx % colors.length],
   }))
 
   const chartConfig = Object.fromEntries(
     data.map((item, idx) => [
-      toSnakeCase(item.developer),
-      { label: item.developer, color: colors[idx % colors.length] },
+      toSnakeCase(item.display_name),
+      { label: item.display_name, color: colors[idx % colors.length] },
     ])
   )
 
@@ -48,16 +48,16 @@ function prepareChartDataLabel(data) {
 
 function prepareChartDataLabelCustom(data) {
   const chartData = data.map((item, idx) => ({
-    text: toSnakeCase(item.developer),
-    label: item.developer,
+    text: toSnakeCase(item.display_name),
+    label: item.display_name,
     overall_score: item.overall_score,
     fill: colors[idx % colors.length],
   }))
 
   const chartConfig = Object.fromEntries(
     data.map((item, idx) => [
-      toSnakeCase(item.developer),
-      { label: item.developer, color: colors[idx % colors.length] },
+      toSnakeCase(item.display_name),
+      { label: item.display_name, color: colors[idx % colors.length] },
     ])
   )
 
@@ -66,8 +66,8 @@ function prepareChartDataLabelCustom(data) {
 
 function prepareChartDataMultiple(data) {
   const chartData = data.map((item, idx) => ({
-    text: toSnakeCase(item.developer),
-    label: item.developer,
+    text: toSnakeCase(item.display_name),
+    label: item.display_name,
     avg_comments_received: item.avg_comments_received,
     avg_comments_per_pr: item.avg_comments_per_pr,
     avg_review_comments_per_pr: item.avg_review_comments_per_pr,
@@ -77,8 +77,8 @@ function prepareChartDataMultiple(data) {
 
   const chartConfig = Object.fromEntries(
     data.map((item, idx) => [
-      toSnakeCase(item.developer),
-      { label: item.developer, color: colors[idx % colors.length] },
+      toSnakeCase(item.display_name),
+      { label: item.display_name, color: colors[idx % colors.length] },
     ])
   )
 
@@ -87,8 +87,8 @@ function prepareChartDataMultiple(data) {
 
 function prepareChartDataMultipleFrequency(data) {
   const chartData = data.map((item, idx) => ({
-    text: toSnakeCase(item.developer),
-    label: item.developer,
+    text: toSnakeCase(item.display_name),
+    label: item.display_name,
     total_prs_all_time: item.total_prs_all_time,
     commits_per_week: item.commits_per_week,
     prs_per_week: item.prs_per_week,
@@ -97,8 +97,8 @@ function prepareChartDataMultipleFrequency(data) {
 
   const chartConfig = Object.fromEntries(
     data.map((item, idx) => [
-      toSnakeCase(item.developer),
-      { label: item.developer, color: colors[idx % colors.length] },
+      toSnakeCase(item.display_name),
+      { label: item.display_name, color: colors[idx % colors.length] },
     ])
   )
 
@@ -134,7 +134,7 @@ function prepareTableData(data) {
 
 
 export default function GithubPage() {
-  const { status, statusFilters, developers, data, setDeveloper } = useGithub()
+  const { status, statusFilters, developers, teams, data, setDeveloper, setTeam } = useGithub()
   const [tableData, setTableData] = React.useState({
     columns: [],
     rows: []
@@ -170,6 +170,7 @@ export default function GithubPage() {
             <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Github</h3>
             <div className="flex flex-row gap-4">
               <LoaderWrapper status={statusFilters}>
+                <ComboBox label="Team" items={teams} setSelected={setTeam} />
                 <ComboBox label="Developer" items={developers} setSelected={setDeveloper} />
               </LoaderWrapper>
             </div>

@@ -18,10 +18,10 @@ export async function GET(req) {
     let sql = `
       SELECT *
       FROM ${catalog}.${schema}.${GOLD_SLACK_TABLE}
-      WHERE type_congratulation IS NOT NULL AND employee_id IS NOT NULL AND TRIM(type_congratulation) <> '' AND TRIM(employee_id) <> ''
+      WHERE type_congratulation IS NOT NULL AND work_email IS NOT NULL AND TRIM(type_congratulation) <> '' AND TRIM(work_email) <> ''
     `;
     if (employeeId) {
-        sql += ` AND employee_id = '${employeeId}'`
+        sql += ` AND work_email = '${employeeId}'`
     }
     if (pin) {
         sql += ` AND pin_congratulation = '${pin}'`
@@ -39,10 +39,10 @@ export async function GET(req) {
       sql += ` AND DATE(congratulations_date) <= DATE('${endDate}')`;
     }
     if (supervisor) {
-        sql += ` AND reporting_to = '${supervisor}'`
+        sql += ` AND reporting_to LIKE '%${supervisor}%'`
     }
     if (team) {
-        sql += ` AND team = '${team}'`
+        sql += ` AND team LIKE '%${team}%'`
     }
     const result = await queryDatabricks(sql)
     return new Response(JSON.stringify(result || []), { status: 200 })
