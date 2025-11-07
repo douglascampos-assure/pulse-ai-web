@@ -31,9 +31,13 @@ export default function DashboardPage() {
 
     try {
       setLoadingTeam(true);
-      const res = await fetch(
-        `/api/team-data?team=${encodeURIComponent(teamName)}`
-      );
+      const params = new URLSearchParams({
+        team: teamName,
+        ...(startDate ? { startDate: startDate.toISOString() } : {}),
+        ...(endDate ? { endDate: endDate.toISOString() } : {}),
+      });
+
+      const res = await fetch(`/api/team-data?${params.toString()}`);
       if (!res.ok) throw new Error("Failed to load team data");
       const data = await res.json();
       console.log(data);

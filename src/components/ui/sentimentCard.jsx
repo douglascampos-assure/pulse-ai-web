@@ -6,7 +6,8 @@ import {
   CardContent,
   CardFooter,
 } from "@/src/components/ui/card";
-import { Smile, Meh, Frown } from "lucide-react";
+import { Smile, Meh, Frown, InfoIcon } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 export default function SentimentCard({ averageSentiment = "Neutral" }) {
   const sentimentConfig = {
@@ -38,8 +39,18 @@ export default function SentimentCard({ averageSentiment = "Neutral" }) {
     <Card
       className={`flex flex-col items-center justify-between rounded-xl shadow-lg p-4 w-full h-60 ${color}`}
     >
-      <CardHeader className="text-center font-bold text-lg w-full">
+      <CardHeader className="relative w-full flex justify-center items-center font-bold text-lg">
         {title}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <InfoIcon className="size-3 cursor-pointer text-slate-400 hover:text-slate-600" />
+          </TooltipTrigger>
+          <TooltipContent>
+            {
+              "Negative: <=50, Neutral: >50 and <=70, Positive: >70 and <=85, Outstanding: >85"
+            }
+          </TooltipContent>
+        </Tooltip>
       </CardHeader>
 
       <CardContent className="flex items-center justify-center flex-grow">

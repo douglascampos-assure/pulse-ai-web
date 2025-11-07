@@ -52,21 +52,22 @@ export async function POST(req) {
       .sign(secret);
 
     // Configurar cookie de sesión
-    const response = NextResponse.json({ message: "User created and logged in" });
+    const response = NextResponse.json({
+      message: "User created and logged in",
+    });
     response.cookies.set("session", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV !== "development",
       sameSite: "strict",
-      path: "/",
+      path: "/da",
       maxAge: 60 * 60 * 4, // 4 horas
     });
 
-    response.headers.set("Location", "/");
+    response.headers.set("Location", "/dashboard");
     return new Response(null, {
       status: 302,
       headers: response.headers,
     });
-
   } catch (error) {
     console.error("Signup error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

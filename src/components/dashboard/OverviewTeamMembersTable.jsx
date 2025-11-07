@@ -1,5 +1,8 @@
 "use client";
 
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { InfoIcon } from "lucide-react";
+
 export default function OverviewTeamMembersTable({
   members = [],
   title = "Team Members Details",
@@ -49,17 +52,98 @@ export default function OverviewTeamMembersTable({
                 colSpan={6}
                 className="px-3 py-2 font-semibold text-slate-700 uppercase text-xs"
               >
-                <div className="grid grid-cols-[40%_60%] items-center justify-items-center gap-4">
+                <div className="grid grid-cols-[20%_80%] items-center justify-items-center gap-4">
                   {/* Parte izquierda */}
                   <div className="justify-self-start">Member</div>
 
                   {/* Parte derecha */}
-                  <div className="grid grid-cols-5 justify-items-center gap-4 w-full">
-                    <div>Performance</div>
-                    <div>Attendance</div>
-                    <div>Velocity</div>
-                    <div>Slack</div>
-                    <div>Meetings</div>
+                  <div className="grid grid-cols-7 justify-items-center gap-4 w-full">
+                    {/* 🟢 Performance */}
+                    <div className="flex items-center gap-1">
+                      Performance
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <InfoIcon className="size-3 cursor-pointer text-slate-400 hover:text-slate-600" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Overall performance score (0–100) calculated from
+                          velocity, attendance, participation, feedback, and
+                          GitHub activity.
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      Attendance
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <InfoIcon className="size-3 cursor-pointer text-slate-400 hover:text-slate-600" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Normalized score (0–100) representing attendance
+                          consistency across scheduled meetings
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      Velocity
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <InfoIcon className="size-3 cursor-pointer text-slate-400 hover:text-slate-600" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Normalized score based on story points completed
+                          relative to the team’s average velocity.
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      Slack
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <InfoIcon className="size-3 cursor-pointer text-slate-400 hover:text-slate-600" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Normalized score based on the number of Kudos mentions
+                          compared to the team average.
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      Participation quality
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <InfoIcon className="size-3 cursor-pointer text-slate-400 hover:text-slate-600" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Normalized score reflecting quality of meeting
+                          participation and engagement (contributions + camera
+                          usage)
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      GitHub
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <InfoIcon className="size-3 cursor-pointer text-slate-400 hover:text-slate-600" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Normalized score representing technical activity
+                          (commits, pull requests, reviews, and merge success).
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      Meetings
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <InfoIcon className="size-3 cursor-pointer text-slate-400 hover:text-slate-600" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Hours spent in meetings during the analyzed period
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                   </div>
                 </div>
               </th>
@@ -78,7 +162,7 @@ export default function OverviewTeamMembersTable({
                   tabIndex={0}
                 >
                   <td colSpan={6} className="px-3 py-2">
-                    <div className="grid grid-cols-[40%_60%] items-center gap-4">
+                    <div className="grid grid-cols-[20%_80%] items-center gap-4">
                       {/* Nombre + Rol + Badges */}
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold text-xs">
@@ -96,7 +180,7 @@ export default function OverviewTeamMembersTable({
                       </div>
 
                       {/* Data */}
-                      <div className="grid grid-cols-5 justify-items-center items-center gap-4">
+                      <div className="grid grid-cols-7 justify-items-center items-center gap-4">
                         {/* 1️⃣ Performance*/}
                         <span
                           className={`inline-block px-2 py-0.5 rounded ${participation.color} text-white font-semibold`}
@@ -110,22 +194,7 @@ export default function OverviewTeamMembersTable({
                         </span>
 
                         {/* 3️⃣ Veloci */}
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 bg-slate-200 rounded-full h-2 w-16">
-                            <div
-                              className={`h-2 rounded-full ${participation.color}`}
-                              style={{
-                                width: `${Math.min(
-                                  m.avgParticipation || 0,
-                                  100
-                                )}%`,
-                              }}
-                            />
-                          </div>
-                          <span className="font-semibold text-slate-800 w-10">
-                            {m.avgParticipation?.toFixed(1) || 0}%
-                          </span>
-                        </div>
+                        <div className="flex items-center gap-2">0</div>
 
                         {/* 4️⃣ Slack  */}
                         <span className="text-slate-800">

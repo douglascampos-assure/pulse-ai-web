@@ -5,6 +5,11 @@ export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const teamName = searchParams.get("team");
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
+
+    const parsedStart = startDate ? new Date(startDate) : null;
+    const parsedEnd = endDate ? new Date(endDate) : null;
 
     console.log(teamName);
 
@@ -17,12 +22,13 @@ export async function GET(req) {
 
     const catalog = process.env.DATABRICKS_CATALOG;
     const schema = process.env.DATABRICKS_SCHEMA_BRONZE;
+    const schema_silver = process.env.DATABRICKS_SCHEMA_SILVER;
     const schema_gold = process.env.DATABRICKS_SCHEMA_GOLD;
 
     // 1️⃣ Miembros del equipo
     const membersResult = await queryDatabricks(`
       SELECT WorkEmail, FirstName, LastName, Department, Lead, Role
-      FROM ${catalog}.${schema}.google_sheets_employees
+      FROM ${catalog}.${schema_silver}.google_sheets_employees
       WHERE Team = '${teamName}'
         AND WorkEmail IS NOT NULL
     `);
@@ -40,57 +46,46 @@ export async function GET(req) {
     );
     const whereClause = likeConditions.join(" OR ");
 
-    // 2️⃣ Jira data (últimos 3 meses)
+    // 2️⃣ Jira data
+
+    let dateFilterGold = "";
+    if (parsedStart && parsedEnd) {
+      dateFilterGold = `AND last_status_date BETWEEN '${parsedStart.toISOString()}' AND '${parsedEnd.toISOString()}'`;
+    } else if (parsedStart) {
+      dateFilterGold = `AND last_status_date >= '${parsedStart.toISOString()}'`;
+    } else if (parsedEnd) {
+      dateFilterGold = `AND last_status_date <= '${parsedEnd.toISOString()}'`;
+    }
     const jiraResult = await queryDatabricks(`
       SELECT 
-        assignee,
-        status,
-        created_at,
-        story_points,
-        key AS issue_key,
-        summary
-      FROM ${catalog}.${schema}.jira_issues
-      WHERE (${whereClause})
-        AND created_at >= date_add(current_date(), -90)
+        work_email,
+        first_name,
+        last_name,
+        COUNT(*) AS tasks_assigned,
+        SUM(committed_story_points) AS comitted_story_points,
+        SUM(CASE WHEN last_status = 'Done' THEN 1 ELSE 0 END) AS tasks_completed,
+        SUM(CASE WHEN last_status = 'Done' THEN completed_story_points ELSE 0 END) AS story_points_completed
+      FROM ${catalog}.${schema_gold}.jira_metrics
+      WHERE work_email IN (${emailsList})
+        ${dateFilterGold}
+      GROUP BY work_email, first_name, last_name
     `);
 
-    // Mapa por persona
-    const jiraMap = {};
-    jiraResult.forEach((row) => {
-      const email = row.assignee?.toLowerCase();
-      if (!email) return;
-      if (!jiraMap[email]) {
-        jiraMap[email] = {
-          assigned: 0,
-          completed: 0,
-          storyPointsTotal: 0,
-          storyPointsCompleted: 0,
-        };
-      }
-      jiraMap[email].assigned += 1;
-      const sp = Number(row.story_points) || 0;
-      jiraMap[email].storyPointsTotal += sp;
-      if (["Done", "READY FOR QA", "Closed"].includes(row.status)) {
-        jiraMap[email].completed += 1;
-        jiraMap[email].storyPointsCompleted += sp;
-      }
-    });
-
     // Totales del equipo
-    const totalAssigned = Object.values(jiraMap).reduce(
-      (s, m) => s + m.assigned,
+    const totalAssigned = jiraResult.reduce(
+      (sum, m) => sum + (m.tasks_assigned || 0),
       0
     );
-    const totalCompleted = Object.values(jiraMap).reduce(
-      (s, m) => s + m.completed,
+    const totalCompleted = jiraResult.reduce(
+      (sum, m) => sum + (m.story_points_completed || 0),
       0
     );
-    const totalStoryPoints = Object.values(jiraMap).reduce(
-      (s, m) => s + m.storyPointsTotal,
+    const totalStoryPoints = jiraResult.reduce(
+      (sum, m) => sum + (m.committed_story_points || 0),
       0
     );
-    const completedStoryPoints = Object.values(jiraMap).reduce(
-      (s, m) => s + m.storyPointsCompleted,
+    const completedStoryPoints = jiraResult.reduce(
+      (sum, m) => sum + (m.tasks_completed || 0),
       0
     );
 
@@ -169,11 +164,13 @@ export async function GET(req) {
       else if (sentimentScore < -0.2) sentimentLabel = "Negative";
 
       // Jira performance
-      const jiraStats = jiraMap[email] || {
-        assigned: 0,
-        completed: 0,
-        storyPointsTotal: 0,
-        storyPointsCompleted: 0,
+      const jiraStats = jiraResult.find(
+        (j) => j.work_email?.toLowerCase() === email
+      ) || {
+        tasks_assigned: 0,
+        tasks_completed: 0,
+        committed_story_points: 0,
+        story_points_completed: 0,
       };
 
       return {
