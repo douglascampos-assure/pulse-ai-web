@@ -236,7 +236,11 @@ export default function TeamMembersTable({
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-2">
                       <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold text-xs">
-                        {member.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                          <img
+                            src={"/images/" + member.name.split(' ')[0].toLowerCase() + "." + member.name.split(' ')[1].toLowerCase() + ".jpg"}
+                            alt={name || "User avatar"}
+                            className="w-full h-full object-cover"
+                          />
                       </div>
                       <p className="font-semibold text-slate-800">{member.name}</p>
                     </div>
