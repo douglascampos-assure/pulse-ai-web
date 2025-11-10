@@ -18,8 +18,8 @@ export async function GET(request, { params }) {
         s.contribution_type,
         s.key_topics,
         s.action_items
-      FROM workspace.silver.recallai_participant_metrics m
-      JOIN workspace.silver.recallai_meeting_sentiment_analysis s
+      FROM workspace.gold.recallai_participant_metrics m
+      JOIN workspace.gold.recallai_meeting_sentiment_analysis s
         ON m.recording_id = s.recording_id 
         AND m.participant_name = s.participant_name
       WHERE m.recording_id = '${recordingId}'
@@ -36,3 +36,4 @@ export async function GET(request, { params }) {
     );
   }
 }
+
