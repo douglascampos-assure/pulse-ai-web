@@ -22,7 +22,7 @@ export function TopTeamMembers({ userMentions = [] }) {
             {userMentions.map((userMention) => (
               <CardBoard
                 key={userMention.displayName}
-                photoUrl={userMention.photoUrl}
+                photoUrl={"/images/" + userMention.displayName.split(' ')[0].toLowerCase() + "." + userMention.displayName.split(' ')[1].toLowerCase() + ".jpg"}
                 name={userMention.displayName}
                 position={userMention.jobTitle}
                 mentions={userMention.kudosCount}

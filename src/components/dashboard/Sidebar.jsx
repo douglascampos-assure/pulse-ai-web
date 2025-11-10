@@ -56,7 +56,7 @@ function SidebarContent() {
         <div className="flex flex-col items-center py-4 border-b border-gray-800 text-center space-y-4">
           <div className="flex-none w-16 h-16 rounded-full bg-blue-500 overflow-hidden border border-gray-500 mb-3">
             <img
-              src={profile?.photoUrl || "/images/test-avatar.jpg"}
+              src={"/images/" + user?.email.split('@')[0] + ".jpg"}
               alt={user?.email || "User avatar"}
               className="w-full h-full object-cover"
             />
