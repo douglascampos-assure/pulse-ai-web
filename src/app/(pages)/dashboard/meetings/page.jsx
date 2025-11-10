@@ -155,7 +155,7 @@ export default function MeetingsPage() {
             date: meeting.meeting_date,
             avgParticipation: (meetingParticipants.reduce((sum, p) => sum + p.speech_percentage, 0) / meetingParticipants.length).toFixed(1),
             avgCamera: (meetingParticipants.reduce((sum, p) => sum + p.camera_on_percentage, 0) / meetingParticipants.length).toFixed(1),
-            avgQuality: (meetingParticipants.reduce((sum, p) => sum + p.contribution_quality_score, 0) / meetingParticipants.length).toFixed(1),
+            avgQuality: (meetingParticipants.reduce((sum, p) => sum + p.contextual_quality_score, 0) / meetingParticipants.length).toFixed(1),
             totalParticipants: meetingParticipants.length
           };
         }
@@ -286,10 +286,48 @@ export default function MeetingsPage() {
     }
   };
 
+  
   /**
-   * Generate AI-powered insights for a team member
-   */
-  const generateInsights = (member) => {
+ * Get badge based on comparison with team average
+ */
+  const getComparisonBadge = (value, average) => {
+    const val = parseFloat(value);
+    const avg = parseFloat(average);
+    const diff = val - avg;
+    const threshold = avg * 0.10; // 10% threshold for "near average"
+
+    // Above average → Excellent
+    if (diff > threshold) {
+      return { 
+        bg: "bg-emerald-500", 
+        text: "text-emerald-700", 
+        label: "Excellent", 
+        lightBg: "bg-emerald-50", 
+        border: "border-emerald-300" 
+      };
+    }
+    
+    // Below average → Needs Improvement
+    if (diff < -threshold) {
+      return { 
+        bg: "bg-rose-500", 
+        text: "text-rose-700", 
+        label: "Needs Improvement", 
+        lightBg: "bg-rose-50", 
+        border: "border-rose-300" 
+      };
+    }
+    
+    // Near average → No badge (return null or empty)
+    return null;
+  };
+
+
+
+  /**
+ * Generate AI-powered insights for a team member with role context
+ */
+  const generateInsights = (member, memberRole = "Team member") => {
     const insights = {
       strengths: [],
       improvements: [],
@@ -299,28 +337,117 @@ export default function MeetingsPage() {
     const avgPart = parseFloat(member.avgParticipation);
     const avgCam = parseFloat(member.avgCamera);
     const avgQual = parseFloat(member.avgQuality);
+    
+    // Get team averages for comparison
+    const teamAvgPart = parseFloat(projectAvg.participation);
+    const teamAvgCam = parseFloat(projectAvg.camera);
+    const teamAvgQual = parseFloat(projectAvg.quality);
 
-    if (avgQual >= 8) insights.strengths.push("Consistently delivers high-quality contributions");
-    if (avgPart >= 20) insights.strengths.push("Active participant with strong engagement");
-    if (avgCam >= 80) insights.strengths.push("Excellent video presence and availability");
+    // Calculate differences
+    const partDiff = ((avgPart - teamAvgPart) / teamAvgPart * 100).toFixed(0);
+    const camDiff = ((avgCam - teamAvgCam) / teamAvgCam * 100).toFixed(0);
+    const qualDiff = ((avgQual - teamAvgQual) / teamAvgQual * 100).toFixed(0);
 
-    if (avgQual < 6) insights.improvements.push("Focus on contribution quality and relevance");
-    if (avgPart < 10) insights.improvements.push("Increase participation in discussions");
-    if (avgCam < 50) insights.improvements.push("Improve camera usage for better team connection");
-
-    if (avgPart < 15 && avgQual >= 7) {
-      insights.recommendations.push("Quality is strong - encourage more frequent participation");
+    // ============================================================================
+    // STRENGTHS - What they do well
+    // ============================================================================
+    
+    // Quality-based strengths
+    if (avgQual > teamAvgQual * 1.1) {
+      insights.strengths.push(`Contextual quality score ${qualDiff}% above team average (${avgQual} vs ${teamAvgQual})`);
     }
-    if (avgPart >= 15 && avgQual < 6) {
-      insights.recommendations.push("Good engagement - focus on more strategic contributions");
+    
+    // Participation-based strengths (role-aware)
+    if (memberRole === "Project Manager" || memberRole === "Product Owner") {
+      if (avgPart >= 20) {
+        insights.strengths.push("Strong facilitation presence - leads discussions effectively");
+      }
+    } else {
+      if (avgPart > teamAvgPart * 1.2) {
+        insights.strengths.push(`Active contributor - speaks ${partDiff}% more than team average`);
+      }
     }
+    
+    // Camera-based strengths
+    if (avgCam > teamAvgCam * 1.15) {
+      insights.strengths.push(`Excellent video engagement - ${camDiff}% above team average`);
+    }
+    
+    // If no strengths found, add a generic positive
+    if (insights.strengths.length === 0 && avgQual >= 7) {
+      insights.strengths.push("Maintains consistent contribution quality across meetings");
+    }
+
+    // ============================================================================
+    // AREAS TO IMPROVE - What needs work
+    // ============================================================================
+    
+    // Quality needs improvement
+    if (avgQual < teamAvgQual * 0.9) {
+      if (memberRole === "Project Manager" || memberRole === "Product Owner") {
+        insights.improvements.push("Contribution quality below expectations for leadership role");
+      } else {
+        insights.improvements.push(`Quality score ${Math.abs(qualDiff)}% below team average - focus on more strategic contributions`);
+      }
+    }
+    
+    // Participation issues (role-aware)
+    if (memberRole === "Team member") {
+      if (avgPart < teamAvgPart * 0.7) {
+        insights.improvements.push(`Low participation (${Math.abs(partDiff)}% below average) - share updates and blockers more actively`);
+      }
+    } else if (memberRole === "Project Manager") {
+      if (avgPart < 15) {
+        insights.improvements.push("As PM, should facilitate more actively to ensure team alignment");
+      }
+    }
+    
+    // Camera usage issues
+    if (avgCam < teamAvgCam * 0.8 && avgCam < 60) {
+      insights.improvements.push(`Camera usage ${Math.abs(camDiff)}% below team average - impacts team connection`);
+    }
+
+    // ============================================================================
+    // RECOMMENDATIONS - Actionable next steps
+    // ============================================================================
+    
+    // Role-specific recommendations
+    if (memberRole === "Project Manager" || memberRole === "Product Owner") {
+      if (avgPart < 20) {
+        insights.recommendations.push("Ask more clarifying questions to guide team discussions");
+      }
+      if (avgQual < 7) {
+        insights.recommendations.push("Focus on strategic decision-making rather than tactical details");
+      }
+    } else if (memberRole === "Team member") {
+      if (avgPart < teamAvgPart && avgQual >= 7) {
+        insights.recommendations.push("Your contributions are quality - speak up more often to maximize impact");
+      }
+      if (avgPart >= 15 && avgQual < 7) {
+        insights.recommendations.push("Participation is strong - focus on concise, high-value updates in Daily Standups");
+      }
+      if (avgPart < 10) {
+        insights.recommendations.push("Aim for brief status updates (30-60 seconds) in each Daily Standup");
+      }
+    }
+    
+    // Camera recommendations
     if (avgCam < 70) {
-      insights.recommendations.push("Enable camera more often to strengthen team dynamics");
+      insights.recommendations.push("Turn on camera during key discussions to strengthen team dynamics");
+    }
+    
+    // Quality-based recommendations
+    if (avgQual >= 8 && avgPart < teamAvgPart) {
+      insights.recommendations.push("Leverage your strong quality by sharing insights more frequently");
+    }
+
+    // Fallback if no recommendations
+    if (insights.recommendations.length === 0) {
+      insights.recommendations.push("Continue current approach and maintain consistency");
     }
 
     return insights;
   };
-
   /**
    * Get top performers data
    */
@@ -335,7 +462,7 @@ export default function MeetingsPage() {
           count: 0 
         };
       }
-      memberStats[p.participant_name].totalQuality += p.contribution_quality_score;
+      memberStats[p.participant_name].totalQuality += p.contextual_quality_score;
       memberStats[p.participant_name].count++;
     });
 
@@ -361,7 +488,7 @@ export default function MeetingsPage() {
           count: 0 
         };
       }
-      memberStats[p.participant_name].totalQuality += p.contribution_quality_score;
+      memberStats[p.participant_name].totalQuality += p.contextual_quality_score;
       memberStats[p.participant_name].count++;
     });
 
@@ -383,6 +510,7 @@ export default function MeetingsPage() {
       if (!memberStats[p.participant_name]) {
         memberStats[p.participant_name] = {
           name: p.participant_name,
+          role: p.role, // 🆕 AGREGAR ESTA LÍNEA
           meetings: 0,
           totalParticipation: 0,
           totalCamera: 0,
@@ -395,12 +523,13 @@ export default function MeetingsPage() {
       memberStats[p.participant_name].totalParticipation += p.speech_percentage;
       memberStats[p.participant_name].totalCamera += p.camera_on_percentage;
       memberStats[p.participant_name].totalInterventions += p.total_utterances;
-      memberStats[p.participant_name].totalQuality += p.contribution_quality_score;
+      memberStats[p.participant_name].totalQuality += p.contextual_quality_score; // Ya cambiaste esto
       memberStats[p.participant_name].contributionTypes.push(p.contribution_type);
     });
 
     return Object.values(memberStats).map(m => ({
       name: m.name,
+      role: m.role, // 🆕 AGREGAR ESTA LÍNEA TAMBIÉN
       meetings: m.meetings,
       avgParticipation: (m.totalParticipation / m.meetings).toFixed(1),
       avgCamera: (m.totalCamera / m.meetings).toFixed(0),
@@ -468,7 +597,7 @@ export default function MeetingsPage() {
     ? (allProjectParticipants.reduce((sum, p) => sum + p.speech_percentage, 0) / allProjectParticipants.length).toFixed(1)
     : 0;
   const avgQuality = allProjectParticipants.length > 0
-    ? (allProjectParticipants.reduce((sum, p) => sum + p.contribution_quality_score, 0) / allProjectParticipants.length).toFixed(1)
+    ? (allProjectParticipants.reduce((sum, p) => sum + p.contextual_quality_score, 0) / allProjectParticipants.length).toFixed(1)
     : 0;
 
   // Team averages for comparison
@@ -480,7 +609,7 @@ export default function MeetingsPage() {
       ? (allProjectParticipants.reduce((sum, p) => sum + p.camera_on_percentage, 0) / allProjectParticipants.length).toFixed(0)
       : "0",
     quality: allProjectParticipants.length > 0
-      ? (allProjectParticipants.reduce((sum, p) => sum + p.contribution_quality_score, 0) / allProjectParticipants.length).toFixed(1)
+      ? (allProjectParticipants.reduce((sum, p) => sum + p.contextual_quality_score, 0) / allProjectParticipants.length).toFixed(1)
       : "0",
     interventions: allProjectParticipants.length > 0 
       ? (allProjectParticipants.reduce((sum, p) => sum + p.total_utterances, 0) / allProjectParticipants.length).toFixed(0)
@@ -644,6 +773,7 @@ export default function MeetingsPage() {
 
           {/* Performance KPIs with Team Comparison */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            {/* Participation */}
             <KPICard
               label="Participation"
               value={memberHistory.length > 0 ? (memberHistory.reduce((sum, m) => sum + m.speech_percentage, 0) / memberHistory.length).toFixed(1) : 0}
@@ -651,7 +781,7 @@ export default function MeetingsPage() {
               icon="🎤"
               badge={(() => {
                 const val = memberHistory.length > 0 ? (memberHistory.reduce((sum, m) => sum + m.speech_percentage, 0) / memberHistory.length) : 0;
-                return getScoreColor(val, "percentage");
+                return getComparisonBadge(val, projectAvg.participation, "higher_is_better");
               })()}
               comparison={{
                 average: projectAvg.participation,
@@ -660,6 +790,7 @@ export default function MeetingsPage() {
               }}
             />
 
+            {/* Camera */}
             <KPICard
               label="Camera"
               value={memberHistory.length > 0 ? (memberHistory.reduce((sum, m) => sum + m.camera_on_percentage, 0) / memberHistory.length).toFixed(0) : 0}
@@ -667,7 +798,7 @@ export default function MeetingsPage() {
               icon="📹"
               badge={(() => {
                 const val = memberHistory.length > 0 ? (memberHistory.reduce((sum, m) => sum + m.camera_on_percentage, 0) / memberHistory.length) : 0;
-                return getScoreColor(val, "percentage");
+                return getComparisonBadge(val, projectAvg.camera, "higher_is_better");
               })()}
               comparison={{
                 average: projectAvg.camera,
@@ -676,10 +807,15 @@ export default function MeetingsPage() {
               }}
             />
 
+            {/* Interventions */}
             <KPICard
               label="Interventions"
               value={memberHistory.length > 0 ? (memberHistory.reduce((sum, m) => sum + m.total_utterances, 0) / memberHistory.length).toFixed(0) : 0}
               icon="💬"
+              badge={(() => {
+                const val = memberHistory.length > 0 ? (memberHistory.reduce((sum, m) => sum + m.total_utterances, 0) / memberHistory.length) : 0;
+                return getComparisonBadge(val, projectAvg.interventions, "higher_is_better");
+              })()}
               comparison={{
                 average: projectAvg.interventions,
                 isAbove: memberHistory.length > 0 && (memberHistory.reduce((sum, m) => sum + m.total_utterances, 0) / memberHistory.length) >= parseFloat(projectAvg.interventions),
@@ -687,19 +823,20 @@ export default function MeetingsPage() {
               }}
             />
 
+            {/* Quality */}
             <KPICard
               label="Quality"
-              value={memberHistory.length > 0 ? (memberHistory.reduce((sum, m) => sum + m.contribution_quality_score, 0) / memberHistory.length).toFixed(1) : 0}
+              value={memberHistory.length > 0 ? (memberHistory.reduce((sum, m) => sum + m.contextual_quality_score, 0) / memberHistory.length).toFixed(1) : 0}
               unit="/10"
               icon="⭐"
               badge={(() => {
-                const val = memberHistory.length > 0 ? (memberHistory.reduce((sum, m) => sum + m.contribution_quality_score, 0) / memberHistory.length) : 0;
-                return getScoreColor(val, "quality");
+                const val = memberHistory.length > 0 ? (memberHistory.reduce((sum, m) => sum + m.contextual_quality_score, 0) / memberHistory.length) : 0;
+                return getComparisonBadge(val, projectAvg.quality, "higher_is_better");
               })()}
               comparison={{
                 average: projectAvg.quality,
-                isAbove: memberHistory.length > 0 && (memberHistory.reduce((sum, m) => sum + m.contribution_quality_score, 0) / memberHistory.length) >= parseFloat(projectAvg.quality),
-                difference: memberHistory.length > 0 ? ((memberHistory.reduce((sum, m) => sum + m.contribution_quality_score, 0) / memberHistory.length) - parseFloat(projectAvg.quality)).toFixed(1) : "0"
+                isAbove: memberHistory.length > 0 && (memberHistory.reduce((sum, m) => sum + m.contextual_quality_score, 0) / memberHistory.length) >= parseFloat(projectAvg.quality),
+                difference: memberHistory.length > 0 ? ((memberHistory.reduce((sum, m) => sum + m.contextual_quality_score, 0) / memberHistory.length) - parseFloat(projectAvg.quality)).toFixed(1) : "0"
               }}
             />
           </div>
@@ -716,7 +853,7 @@ export default function MeetingsPage() {
             <QualityTrendChart
               data={memberHistory}
               title="Quality Trend"
-              dataKey="contribution_quality_score"
+              dataKey="contextual_quality_score"
               dateKey="meeting_date"
             />
           </div>
@@ -727,9 +864,13 @@ export default function MeetingsPage() {
               name: selectedMember,
               avgParticipation: memberHistory.length > 0 ? (memberHistory.reduce((sum, m) => sum + m.speech_percentage, 0) / memberHistory.length).toFixed(1) : 0,
               avgCamera: memberHistory.length > 0 ? (memberHistory.reduce((sum, m) => sum + m.camera_on_percentage, 0) / memberHistory.length).toFixed(0) : 0,
-              avgQuality: memberHistory.length > 0 ? (memberHistory.reduce((sum, m) => sum + m.contribution_quality_score, 0) / memberHistory.length).toFixed(1) : 0
+              avgQuality: memberHistory.length > 0 ? (memberHistory.reduce((sum, m) => sum + m.contextual_quality_score, 0) / memberHistory.length).toFixed(1) : 0
             };
-            const insights = generateInsights(memberStats);
+            // Get member role from allProjectParticipants
+            const memberData = allProjectParticipants.find(p => p.participant_name === selectedMember);
+            const memberRole = memberData?.role || "Team member";
+
+            const insights = generateInsights(memberStats, memberRole);
 
             return (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -841,7 +982,7 @@ export default function MeetingsPage() {
 
             <KPICard
               label="Avg Quality"
-              value={participants.length > 0 ? (participants.reduce((sum, p) => sum + p.contribution_quality_score, 0) / participants.length).toFixed(1) : 0}
+              value={participants.length > 0 ? (participants.reduce((sum, p) => sum + p.contextual_quality_score, 0) / participants.length).toFixed(1) : 0}
               unit="/10"
               icon="⭐"
             />
@@ -903,7 +1044,7 @@ export default function MeetingsPage() {
 
                 <KPICard
                   label="Quality"
-                  value={memberData.contribution_quality_score}
+                  value={memberData.contextual_quality_score}
                   unit="/10"
                   icon="⭐"
                 />
