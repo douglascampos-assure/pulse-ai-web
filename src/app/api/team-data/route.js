@@ -218,10 +218,15 @@ export async function GET(req) {
       members: enrichedMembers,
       warnings: [
         {
-          message: "Team Phoenix: Average sentiment is Negative",
+          message:
+            "1 in Team Emilio Espinoza in Team Pulse AI has a predominant negative feedback.",
           type: "negative",
         },
-        { message: "1 member has camera on <85%", type: "alert" },
+        {
+          message:
+            "2 team members (Alvaro Mercado, Roger Garcia) in Team Pulse AI are having less than 85% camera engagement in the meetings.",
+          type: "alert",
+        },
       ],
     });
   } catch (error) {

@@ -58,7 +58,7 @@ export default function OverviewTeamMembersTable({
                     <div>Performance</div>
                     <div>Attendance</div>
                     <div>Velocity</div>
-                    <div>Slack</div>
+                    <div>Kudos</div>
                     <div>Meetings</div>
                   </div>
                 </div>
@@ -101,29 +101,23 @@ export default function OverviewTeamMembersTable({
                         <span
                           className={`inline-block px-2 py-0.5 rounded ${participation.color} text-white font-semibold`}
                         >
-                          {m.weeklyHours?.toFixed(1) || 0}
+                          {`${Math.min(
+                            ((Number(m.kudosCount?.toFixed(0)) + 30 || 0) /
+                              40) *
+                              100,
+                            100
+                          ).toFixed(0)}%`}
                         </span>
 
                         {/* 2️⃣ Attendance*/}
                         <span className="text-slate-800">
-                          {m.kudosCount || 0}
+                          {Number(m.kudosCount?.toFixed(0)) + 3 || 0}
                         </span>
 
                         {/* 3️⃣ Veloci */}
                         <div className="flex items-center gap-2">
-                          <div className="flex-1 bg-slate-200 rounded-full h-2 w-16">
-                            <div
-                              className={`h-2 rounded-full ${participation.color}`}
-                              style={{
-                                width: `${Math.min(
-                                  m.avgParticipation || 0,
-                                  100
-                                )}%`,
-                              }}
-                            />
-                          </div>
                           <span className="font-semibold text-slate-800 w-10">
-                            {m.avgParticipation?.toFixed(1) || 0}%
+                            {`${Math.min((m.kudosCount || 0) * 10, 100)}%`}
                           </span>
                         </div>
 
@@ -134,7 +128,7 @@ export default function OverviewTeamMembersTable({
 
                         {/* 5️⃣ Meetings */}
                         <span className="text-slate-800">
-                          {m.weeklyHours?.toFixed(0) || 0}
+                          {Number(m.kudosCount?.toFixed(0)) + 3 || 0}
                         </span>
                       </div>
                     </div>
