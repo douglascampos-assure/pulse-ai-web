@@ -14,7 +14,6 @@ const links = [
   { href: "/dashboard/slack", label: "Slack Analytics", icon: SiSlack },
   { href: "/dashboard/meetings", label: "Meetings", icon: BarChart3 },
   { href: "/dashboard/feedbacks", label: "Feedbacks", icon: MessageCircle },
-  { href: "/dashboard/teams", label: "Teams", icon: Users },
   { href: "/dashboard/jira", label: "Jira Tracking", icon: SiJira },
   { href: "/dashboard/github", label: "Github Tracking", icon: SiGithub }
 ];
@@ -109,3 +108,4 @@ export default function Sidebar() {
     </Suspense>
   );
 }
+
