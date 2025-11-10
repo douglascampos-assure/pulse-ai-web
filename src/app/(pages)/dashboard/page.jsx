@@ -67,7 +67,7 @@ export default function DashboardPage() {
   if (selectedTeam === "Pulse ai") {
     sentimentMessage =
       "1 team member in Pulse ai shows mostly negative feedback.";
-    cameraMessage = "“2 members of Pulse ai show low camera usage in meetings.";
+    cameraMessage = "2 members of Pulse ai show low camera usage in meetings.";
   }
   return (
     <div className="p-6 flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900  w-full space-y-6">
