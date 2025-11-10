@@ -16,7 +16,7 @@ const JiraDashboardPage = () => {
   const [endDate, setEndDate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   
-  const [periodicity, setPeriodicity] = useState("1week");  
+  const [periodicity, setPeriodicity] = useState("sprint");  
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -62,6 +62,7 @@ const JiraDashboardPage = () => {
           <h3 className="text-2xl font-semibold tracking-tight text-slate-800">
             Jira Performance Dashboard
           </h3>
+  
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 w-full">
             <div className="space-y-1">
               <Label className="text-xs font-semibold text-slate-700">Select Team / Project</Label>
@@ -95,7 +96,7 @@ const JiraDashboardPage = () => {
                 ))}
               </select>
             </div>
-            
+  
             <div className="space-y-1">
               <Label className="text-xs font-semibold text-slate-700">Periodicity</Label>
               <select
@@ -126,35 +127,38 @@ const JiraDashboardPage = () => {
       </Card>
   
       {selectedTeam ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
-          <VelocityChart
-            team={selectedTeam}
-            employee={selectedEmployee}
-            startDate={startDate}
-            endDate={endDate}
-          />
-          <ThroughputChart
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
+            <VelocityChart
+              team={selectedTeam}
+              employee={selectedEmployee}
+              startDate={startDate}
+              endDate={endDate}
+            />
+  
+            <ThroughputChart
+              team={selectedTeam}
+              employee={selectedEmployee}
+              startDate={startDate}
+              endDate={endDate}
+              periodicity={periodicity}
+            />
+          </div>
+          <CycleTimeChart
             team={selectedTeam}
             employee={selectedEmployee}
             startDate={startDate}
             endDate={endDate}
             periodicity={periodicity}
           />
-          <CycleTimeChart 
-            team={selectedTeam}
-            employee={selectedEmployee}
-            startDate={startDate}
-            endDate={endDate}
-            periodicity={periodicity}
-          />
-        </div>
+        </>
       ) : (
         <div className="flex justify-center items-center h-[400px] border-2 border-dashed rounded-lg bg-gray-50 text-gray-500">
           <p>Please select a team to view the charts.</p>
         </div>
       )}
     </div>
-  );
+  );  
 };
 
 export default JiraDashboardPage;
