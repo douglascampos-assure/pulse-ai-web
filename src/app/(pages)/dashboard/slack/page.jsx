@@ -19,8 +19,14 @@ import { useSlack } from "@/src/hooks/use-slack"
 
 function prepareKudosByFeatureChartData(data) {
   const counts = data.reduce((acc, item) => {
-    const feature = item.highlighted_feature || "Other"
-    acc[feature] = (acc[feature] || 0) + 1
+    const features = item.highlighted_features && item.highlighted_features.length > 0
+      ? item.highlighted_features.split(',')
+      : ["Other"]
+
+    features.forEach(feature => {
+      acc[feature] = (acc[feature] || 0) + 1
+    })
+
     return acc
   }, {})
 
@@ -89,13 +95,13 @@ function groupAndSortKudos(data = []) {
   if (!Array.isArray(data)) return []
 
   const grouped = data.reduce((acc, kudo) => {
-    const name = kudo.displayName
+    const name = `${kudo.first_name} ${kudo.last_name}`
 
     if (!acc[name]) {
       acc[name] = {
         displayName: name,
-        jobTitle: kudo.jobTitle,
-        photoUrl: kudo.photoUrl,
+        jobTitle: kudo.job_title,
+        photoUrl: kudo.photo_url,
         kudosCount: 0,
         kudosList: [],
       }
@@ -113,7 +119,7 @@ function groupAndSortKudos(data = []) {
 }
 
 export default function SlackPage() {
-  const { status, statusFilters, kudos, members, types, details, pins, supervisors, member, setMember, setDetail, setPin, setType, setEndDate, setStartDate, setSupervisor } = useSlack()
+  const { status, statusFilters, kudos, members, types, details, pins, supervisors, teams, member, setMember, setDetail, setPin, setType, setEndDate, setStartDate, setSupervisor, setTeam } = useSlack()
   const [tableData, setTableData] = React.useState({
     columns: [],
     rows: []
@@ -134,9 +140,10 @@ export default function SlackPage() {
         <Card className="w-full">
           <CardContent className="flex gap-4 flex-col justify-center items-center">
             <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Slack</h3>
-            <div className="flex flex-row gap-4">
+            <div className="flex flex-wrap gap-4">
               <LoaderWrapper status={statusFilters}>
                     {supervisors.length > 1 && <ComboBox label="Supervisor" items={supervisors} setSelected={setSupervisor} />}
+                    <ComboBox label="Team" items={teams} setSelected={setTeam} />
                     <ComboBox label="Team Member" items={members} setSelected={setMember} />
                     <CalendarField label="Start Date" setDate={setStartDate} />
                     <CalendarField label="End Date" setDate={setEndDate} />

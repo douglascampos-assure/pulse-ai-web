@@ -11,6 +11,7 @@ export function useSlack() {
   const [details, setDetails] = React.useState([])
   const [pins, setPins] = React.useState([])
   const [kudos, setKudos] = React.useState([])
+  const [teams, setTeams] = React.useState([])
   const [member, setMember] = React.useState(null)
   const [type, setType] = React.useState(null)
   const [detail, setDetail] = React.useState(null)
@@ -18,7 +19,32 @@ export function useSlack() {
   const [startDate, setStartDate] = React.useState(null)
   const [endDate, setEndDate] = React.useState(null)
   const [supervisor, setSupervisor] = React.useState(null)
+  const [team, setTeam] = React.useState(null)
   React.useEffect(() => {
+    const fetchTeams = async () => {
+      try {
+        const url = "/api/slack/teams"
+
+        const res = await fetch(url)
+
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}: ${res.statusText}`)
+        }
+
+        const data = await res.json()
+        setTeams(data)
+
+        if (data.length) {
+          setStatusFilters({ type: "normal", detail: "" })
+        } else {
+          setStatusFilters({ type: "no-data", detail: "" })
+        }
+      } catch (err) {
+        console.error("Error fetching Databricks Teams:", err)
+        setStatusFilters({ type: "error", detail: err.message })
+      }
+    }
+
     const fetchMembers = async () => {
       try {
         const url = "/api/slack/users"
@@ -144,6 +170,7 @@ export function useSlack() {
     fetchTypes()
     fetchDetails()
     fetchPins()
+    fetchTeams()
   }, [])
 
   React.useEffect(() => {
@@ -151,7 +178,7 @@ export function useSlack() {
     const fetchKudos = async () => {
       try {
         let url = "/api/slack?"
-        if (member && typeof member.value === "string" && member.value.trim().length !== 0) {
+        if (member && member.value) {
           url += `employee=${encodeURIComponent(member.value)}&`
         }
         if (pin && typeof pin.value === "string" && pin.value.trim().length !== 0) {
@@ -165,6 +192,9 @@ export function useSlack() {
         }
         if (supervisor && typeof supervisor.value === "string" && supervisor.value.trim().length !== 0) {
           url += `supervisor=${encodeURIComponent(supervisor.value)}&`
+        }
+        if (team && typeof team.value === "string" && team.value.trim().length !== 0) {
+          url += `team=${encodeURIComponent(team.value)}&`
         }
         const formatDate = (date) => date instanceof Date ? date.toISOString().split("T")[0] : "";
         const formattedStart = formatDate(startDate);
@@ -197,7 +227,7 @@ export function useSlack() {
     }
 
     fetchKudos()
-  }, [pin, type, detail, member, startDate, endDate, supervisor])
+  }, [pin, type, detail, member, startDate, endDate, supervisor, team])
 
   return {
     status,
@@ -208,6 +238,7 @@ export function useSlack() {
     types,
     details,
     pins,
+    teams,
     member,
     setDetail,
     setType,
@@ -215,6 +246,7 @@ export function useSlack() {
     setPin,
     setStartDate,
     setEndDate,
-    setSupervisor
+    setSupervisor,
+    setTeam,
   }
 }

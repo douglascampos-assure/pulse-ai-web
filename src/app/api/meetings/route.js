@@ -11,7 +11,7 @@ export async function GET() {
         COUNT(DISTINCT participant_name) as total_participants,
         ROUND(AVG(speech_percentage), 2) as avg_speech,
         ROUND(AVG(camera_on_percentage), 2) as avg_camera
-      FROM workspace.silver.recallai_participant_metrics
+      FROM workspace.gold.recallai_participant_metrics
       GROUP BY meeting_id, recording_id, meeting_date
       ORDER BY meeting_date DESC
     `;

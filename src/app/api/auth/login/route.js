@@ -33,7 +33,14 @@ export async function POST(req) {
 
     const user = result[0];
 
-    const passwordMatch = password === user.password;//await bcrypt.compare(password, user.password);
+    if (user.status !== "ACTIVE") {
+      return NextResponse.json(
+        { error: "User is not active" },
+        { status: 403 }
+      );
+    }
+
+    const passwordMatch = password === user.password; //await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
       return NextResponse.json(
@@ -44,8 +51,11 @@ export async function POST(req) {
 
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const alg = "HS256";
-
-    const token = await new SignJWT({ email: user.user_email, userId: user.id, type: user.user_type })
+    const token = await new SignJWT({
+      email: user.user_email,
+      userId: user.id,
+      type: user.type,
+    })
       .setProtectedHeader({ alg })
       .setExpirationTime("2h")
       .setIssuedAt()

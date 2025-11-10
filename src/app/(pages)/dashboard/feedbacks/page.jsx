@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { SentimentTrendChart } from "@/src/components/custom/SentimentTrendChart";
 import SkillsOverviewChart from "@/src/components/custom/SkillsOverviewChart";
 import { RecommendedCoursesCards } from "@/src/components/custom/RecommendedCoursesCards";
+import { Label } from "@/src/components/ui/label"
+import { Card, CardContent } from "@/src/components/ui/card";
 
 const FeedbacksPage = () => {
   const [sentimentTrend, setSentimentTrend] = useState(null);
@@ -23,6 +25,9 @@ const FeedbacksPage = () => {
         const res = await fetch('/api/filters/teams');
         const data = await res.json();
         setTeams(data);
+        if (Array.isArray(data) && data.length > 0) {
+          setSelectedTeam(data[0]);
+        }
       } catch (error) {
         console.error("Error fetching teams list:", error);
       }
@@ -128,64 +133,86 @@ const FeedbacksPage = () => {
   }, [selectedTeam, selectedEmployee, startDate, endDate]);
 
   return (
-    <div className="flex flex-col gap-8 w-full max-w-7xl mx-auto p-4">
-      <div className="flex flex-wrap gap-4 mb-4">
-        <select
-          className="border rounded p-2"
-          value={selectedTeam}
-          onChange={(e) => setSelectedTeam(e.target.value)}
-        >
-          <option value="">All Teams</option>
-          {teams.map((team) => (
-            <option key={team} value={team}>
-              {team}
-            </option>
-          ))}
-        </select>
-
-        <select
-          className="border rounded p-2"
-          value={selectedEmployee}
-          onChange={(e) => setSelectedEmployee(e.target.value)}
-          disabled={!selectedTeam} 
-        >
-          <option value="">All Employees</option>
-          {employees.map((emp) => (
-            <option key={emp.id} value={emp.id}>
-              {emp.displayName} 
-            </option>
-          ))}
-        </select>
-
-        <input
-          type="date"
-          className="border rounded p-2"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-        <input
-          type="date"
-          className="border rounded p-2"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-        />
-      </div>
-
+    <div className="flex flex-col gap-10 w-full max-w-7xl mx-auto p-6">
+  
+      <Card className="w-full shadow-lg">
+        <CardContent className="flex flex-col gap-6 p-6">
+  
+          <h3 className="text-2xl font-semibold tracking-tight text-slate-800">
+            Feedback Dashboard
+          </h3>
+  
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+  
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold text-slate-700">Select Team</Label>
+              <select
+                className="border rounded-md p-3 w-full bg-white"
+                value={selectedTeam}
+                onChange={(e) => setSelectedTeam(e.target.value)}
+              >
+                <option value="">All Teams</option>
+                {teams.map((team) => (
+                  <option key={team} value={team}>
+                    {team}
+                  </option>
+                ))}
+              </select>
+            </div>
+  
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold text-slate-700">Select Employee</Label>
+              <select
+                className="border rounded-md p-3 w-full bg-white"
+                value={selectedEmployee}
+                onChange={(e) => setSelectedEmployee(e.target.value)}
+                disabled={!selectedTeam}
+              >
+                <option value="">All Employees</option>
+                {employees.map((emp) => (
+                  <option key={emp.id} value={emp.id}>
+                    {emp.displayName}
+                  </option>
+                ))}
+              </select>
+            </div>
+  
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold text-slate-700">Start Date</Label>
+              <input
+                type="date"
+                className="border rounded-md p-3 w-full bg-white"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+  
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold text-slate-700">End Date</Label>
+              <input
+                type="date"
+                className="border rounded-md p-3 w-full bg-white"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+  
+          </div>
+        </CardContent>
+      </Card>
+  
       {selectedTeam ? (
         <>
-        <div className="w-full max-w-7xl mx-auto">
-          <SentimentTrendChart
-            chartData={sentimentTrend}
-            isEmployeeView={!!selectedEmployee}
-            teamAverages={teamSentimentAverages}
-          />
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-7xl mx-auto">
-          <div className="flex flex-col">
-            <RecommendedCoursesCards coursesData={topCourses} />
+          <div className="w-full">
+            <SentimentTrendChart
+              chartData={sentimentTrend}
+              isEmployeeView={!!selectedEmployee}
+              teamAverages={teamSentimentAverages}
+            />
           </div>
-      
-          <div className="flex flex-col">
+  
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
+            <RecommendedCoursesCards coursesData={topCourses} />
             <SkillsOverviewChart
               team={selectedTeam}
               employee={selectedEmployee}
@@ -193,8 +220,7 @@ const FeedbacksPage = () => {
               endDate={endDate}
             />
           </div>
-        </div>
-      </>
+        </>
       ) : (
         <div className="flex justify-center items-center h-[400px] border-2 border-dashed rounded-lg bg-gray-50 text-gray-500">
           <p>Please select a team to view the charts.</p>

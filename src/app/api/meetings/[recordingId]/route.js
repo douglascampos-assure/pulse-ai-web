@@ -14,7 +14,7 @@ export async function GET(request, { params }) {
             PARTITION BY recording_id, participant_name 
             ORDER BY created_at DESC
           ) as rn
-        FROM workspace.silver.recallai_meeting_sentiment_analysis
+        FROM workspace.gold.recallai_meeting_sentiment_analysis
       )
       SELECT 
         m.participant_name,
@@ -33,7 +33,7 @@ export async function GET(request, { params }) {
         s.contribution_type,
         s.key_topics,
         s.action_items
-      FROM workspace.silver.recallai_participant_metrics m
+      FROM workspace.gold.recallai_participant_metrics m
       JOIN deduplicated_sentiment s
         ON m.recording_id = s.recording_id 
         AND m.participant_name = s.participant_name

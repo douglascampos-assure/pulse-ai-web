@@ -7,14 +7,14 @@ const catalog = process.env.DATABRICKS_CATALOG
 export async function GET() {
   try {
     let sql = `
-      SELECT DISTINCT displayName, employee_id
-      FROM ${catalog}.gold.${GOLD_SLACK_TABLE}
-      WHERE type_congratulation is not NULL
+      SELECT DISTINCT display_name, work_email
+      FROM ${catalog}.${schema}.${GOLD_SLACK_TABLE}
+      WHERE type_congratulation is not NULL AND display_name IS NOT NULL AND work_email IS NOT NULL AND TRIM(type_congratulation) <> '' AND TRIM(work_email) <> '' AND TRIM(display_name) <> ''
     `;
     const result = await queryDatabricks(sql);
     const formatted = (result || []).map(row => ({
-      value: row.employee_id,
-      label: row.displayName,
+      value: row.work_email,
+      label: row.display_name,
     }));
     return new Response(JSON.stringify(formatted || []), { status: 200 });
   } catch (error) {

@@ -29,7 +29,7 @@ export async function GET(req) {
       id: row.Employee_Id,
       displayName: row.Employee
     }));
-
+    console.log("Fetched employees:", employees);
     return NextResponse.json(employees);
   } catch (error) {
     console.error("Error fetching employees:", error);

@@ -9,7 +9,7 @@ export async function GET() {
     let sql = `
       SELECT DISTINCT detail_congratulation
       FROM ${catalog}.${schema}.${GOLD_SLACK_TABLE}
-      WHERE type_congratulation is not NULL
+      WHERE type_congratulation is not NULL AND detail_congratulation IS NOT NULL AND work_email IS NOT NULL AND TRIM(detail_congratulation) <> '' AND TRIM(work_email) <> '' AND TRIM(type_congratulation) <> ''
     `;
     const result = await queryDatabricks(sql);
     const formatted = (result || []).map(row => ({
