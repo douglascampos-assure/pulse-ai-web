@@ -11,7 +11,8 @@ export function CardBoard({
       <CardContent className="p-4 flex flex-col items-center text-center">
         <div className="w-20 h-20 relative rounded-full overflow-hidden border border-gray-200 mb-2">
           <img
-            src="/images/test-avatar.jpg"//src={photoUrl || "/images/test-avatar.jpg"}
+            //src="/images/test-avatar.jpg"
+            src={photoUrl}
             alt={name || "User avatar"}
             className="w-full h-full object-cover"
           />

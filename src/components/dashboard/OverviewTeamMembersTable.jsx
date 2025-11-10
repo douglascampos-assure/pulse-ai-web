@@ -166,8 +166,11 @@ export default function OverviewTeamMembersTable({
                       {/* Nombre + Rol + Badges */}
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold text-xs">
-                          {m.FirstName?.[0]}
-                          {m.LastName?.[0]}
+                          <img
+                            src={"/images/" + m.FirstName.toLowerCase() + "." + m.LastName.toLowerCase() + ".jpg"}
+                            alt={name || "User avatar"}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                         <div className="flex flex-col">
                           <span className="font-semibold text-slate-800">
