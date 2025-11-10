@@ -16,7 +16,7 @@ const JiraDashboardPage = () => {
   const [endDate, setEndDate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   
-  const [periodicity, setPeriodicity] = useState("2week"); 
+  const [periodicity, setPeriodicity] = useState("1week");  
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -133,7 +133,7 @@ const JiraDashboardPage = () => {
             startDate={startDate}
             endDate={endDate}
           />
-          {/* <ThroughputChart
+          <ThroughputChart
             team={selectedTeam}
             employee={selectedEmployee}
             startDate={startDate}
@@ -146,7 +146,7 @@ const JiraDashboardPage = () => {
             startDate={startDate}
             endDate={endDate}
             periodicity={periodicity}
-          /> */}
+          />
         </div>
       ) : (
         <div className="flex justify-center items-center h-[400px] border-2 border-dashed rounded-lg bg-gray-50 text-gray-500">

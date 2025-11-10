@@ -4,7 +4,6 @@ import { useEffect, useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Loader } from "lucide-react";
 
-// Función simple para generar colores para los tipos de issue
 const issueTypeColors = {};
 const getColorForIssueType = (type) => {
   if (issueTypeColors[type]) return issueTypeColors[type];
@@ -50,9 +49,8 @@ export default function ThroughputChart({ team = "", employee = "", startDate = 
     })();
     
     return () => controller.abort();
-  }, [team, employee, startDate, endDate, periodicity]); // Añadir periodicity
+  }, [team, employee, startDate, endDate, periodicity]);
 
-  // 'useMemo' para pivotar los datos
   const { chartData, issueTypes, maxCount } = useMemo(() => {
     if (!data || data.length === 0) {
       return { chartData: [], issueTypes: [], maxCount: 1 };
@@ -62,7 +60,6 @@ export default function ThroughputChart({ team = "", employee = "", startDate = 
     const types = new Set();
     let max = 1;
 
-    // 1. Agrupar por período
     data.forEach(row => {
       if (!pivotedData[row.period]) {
         pivotedData[row.period] = { period: row.period };
@@ -78,7 +75,6 @@ export default function ThroughputChart({ team = "", employee = "", startDate = 
     return { chartData, issueTypes, maxCount: max };
   }, [data]);
 
-  // Estados de carga y vacíos
   if (loading) {
     return (
       <Card className="min-h-[300px] flex justify-center items-center">
@@ -95,7 +91,6 @@ export default function ThroughputChart({ team = "", employee = "", startDate = 
     );
   }
 
-  // Renderizar el gráfico
   return (
     <Card>
       <CardHeader>
@@ -103,21 +98,19 @@ export default function ThroughputChart({ team = "", employee = "", startDate = 
         <div className="text-sm text-gray-500">Tickets completed by period and type.</div>
       </CardHeader>
       <CardContent>
-        {/* Leyenda */}
         <div className="flex flex-wrap gap-x-4 gap-y-2 pb-4">
           {issueTypes.map(type => (
             <Legend key={type} color={getColorForIssueType(type)} label={type} />
           ))}
         </div>
         
-        {/* Gráfico */}
         <div className="space-y-6">
           {chartData.map((periodData) => (
             <div key={periodData.period} className="space-y-2">
               <span className="font-semibold">{periodData.period}</span>
               {issueTypes.map(type => {
                 const count = periodData[type] || 0;
-                if (count === 0) return null; // No mostrar barra si es 0
+                if (count === 0) return null;
                 
                 const pct = Math.round((count / maxCount) * 100);
                 const color = getColorForIssueType(type);

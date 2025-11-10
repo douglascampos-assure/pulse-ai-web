@@ -44,7 +44,11 @@ export async function GET(req) {
         break;
       case "2week":
       default:
-        periodColumn = `date_add('1970-01-05', (floor(datediff(${DATE_COLUMN_FOR_GROUPING}, '1970-01-05') / 14) * 14))`;
+        periodColumn = `date_add('1970-01-05', 
+          CAST(
+            (floor(datediff(done_date, '1970-01-05') / 14) * 14) 
+          AS INT)
+        )`;
         break;
     }
 
@@ -64,11 +68,17 @@ export async function GET(req) {
 
     const rows = await queryDatabricks(sql);
     
-    const formattedRows = rows.map(row => ({
-      ...row,
-      period: row.period instanceof Date ? row.period.toISOString().split('T')[0] : row.period,
-      avg_cycle_time_days: parseFloat(row.avg_cycle_time_days.toFixed(2)),
-    }));
+    const formattedRows = rows.map(row => {
+      const periodValue = row.period instanceof Date ? row.period.toISOString().split('T')[0] : row.period;
+      const cycleTimeValue = row.avg_cycle_time_days !== null && row.avg_cycle_time_days !== undefined
+          ? parseFloat(row.avg_cycle_time_days.toFixed(2))
+          : null;
+      return {
+          ...row,
+          period: periodValue,
+          avg_cycle_time_days: cycleTimeValue,
+      };
+  });
 
     return NextResponse.json(Array.isArray(rows) ? formattedRows : []);
   } catch (error) {
