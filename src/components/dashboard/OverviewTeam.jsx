@@ -18,9 +18,10 @@ export default function OverviewTeam({ teamData, performanceData }) {
         <SimpleCard
           bgColor="bg-white"
           textColor="text-black"
-          indicator={
-            teamData.avgWeeklyHours ? teamData.avgWeeklyHours.toFixed(1) : "0"
-          }
+          // indicator={
+          //   teamData.avgWeeklyHours ? teamData.avgWeeklyHours.toFixed(1) : "0"
+          // }
+          indicator="15h"
           description="Meetings this week"
           icon="/icons/meetings.png"
         />
