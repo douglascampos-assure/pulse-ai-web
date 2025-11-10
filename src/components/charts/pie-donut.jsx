@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Label, Pie, PieChart } from "recharts"
+import { Label, Pie, PieChart } from "recharts" 
 
 import {
   Card,
@@ -55,6 +55,7 @@ const chartConfigDefault = {
 const titleDefault = "Highlighted Features"
 const descriptionDefault = "Kudos"
 const centerTextDefault = "Amount"
+
 export function PieDonut({ title = titleDefault, description = descriptionDefault, centerText = centerTextDefault, chartConfig = chartConfigDefault, chartData = chartDataDefault }) {
   const totalData = React.useMemo(() => {
     return chartData.reduce((acc, curr) => acc + curr.amount, 0)
@@ -66,10 +67,12 @@ export function PieDonut({ title = titleDefault, description = descriptionDefaul
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
+      
+      <CardContent className="flex-1 p-4 flex flex-row items-center justify-center gap-6"> 
+        
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[380px]"
+          className="aspect-square w-full max-w-[250px] flex-shrink-0"
         >
           <PieChart>
             <ChartTooltip
@@ -135,6 +138,33 @@ export function PieDonut({ title = titleDefault, description = descriptionDefaul
             </Pie>
           </PieChart>
         </ChartContainer>
+        <div className="flex flex-col gap-2 text-sm">
+          {chartData.map((item) => {
+            const label = chartConfig[item.text]?.label || item.text;
+            const color = chartConfig[item.text]?.color || item.fill;
+            
+            return (
+              <div
+                key={item.text}
+                className="flex items-center gap-2"
+              >
+                <span
+                  className="flex h-3 w-3 shrink-0 rounded-sm"
+                  style={{ backgroundColor: color }}
+                />
+                <div className="flex flex-1 justify-between leading-none">
+                  <span className="font-medium text-foreground">
+                    {label}
+                  </span>
+                  <span className="ml-4 font-medium text-foreground">
+                    {item.amount}
+                  </span>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
       </CardContent>
     </Card>
   )
