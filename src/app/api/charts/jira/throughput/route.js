@@ -48,11 +48,11 @@ export async function GET(req) {
     const sql = `
       SELECT
         ${groupBy} as period,
-        project_type,
+        issue_type,
         COUNT(issue_key) as ticket_count
       FROM ${catalog}.${schema}.jira_metrics
       ${whereSQL}
-      GROUP BY period, project_type
+      GROUP BY period, issue_type
       ORDER BY period
     `;
 

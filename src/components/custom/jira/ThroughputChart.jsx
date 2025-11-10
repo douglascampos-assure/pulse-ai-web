@@ -40,17 +40,17 @@ export const ThroughputChart = ({ team, member, startDate, endDate, periodicity,
   }
 
   const processedData = data.reduce((acc, curr) => {
-    const { period, project_type, ticket_count } = curr;
+    const { period, issue_type, ticket_count } = curr;
     let periodObj = acc.find(item => item.period === period);
     if (!periodObj) {
       periodObj = { period };
       acc.push(periodObj);
     }
-    periodObj[project_type] = ticket_count;
+    periodObj[issue_type] = ticket_count;
     return acc;
   }, []);
 
-  const yKeys = [...new Set(data.map(d => d.project_type))];
+  const yKeys = [...new Set(data.map(d => d.issue_type))];
 
   return (
     <div className="w-full">
