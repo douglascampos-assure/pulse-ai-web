@@ -7,7 +7,21 @@ export default function OverviewGlobalData({
   teams = [],
   sentimentMessage = "Average sentiment data not available",
   cameraMessage = "No camera usage data available",
+  typeSentimenAlert,
+  typeCameraAlert,
 }) {
+  const getColors = (type) => {
+    console.log(type);
+    switch (type) {
+      case "Alert":
+        return { bgColor: "bg-[#FFBABA]", textColor: "text-black" };
+      case "Warning":
+        return { bgColor: "bg-yellow-200", textColor: "text-black" };
+      default:
+        return { bgColor: "bg-[#C4E7FF]", textColor: "text-black" };
+    }
+  };
+
   return (
     <div className="mb-1 py-5 flex justify-center px-8 bg-white rounded-xl shadow-lg">
       <div className="flex items-center w-full px-20">
@@ -24,15 +38,17 @@ export default function OverviewGlobalData({
         {/* --- Mensajes --- */}
         <div className="flex flex-col justify-center gap-4 ml-8 w-full">
           <div
-            className="w-full h-8 rounded-xl shadow-md flex items-center px-4 py-2 text-sm font-medium"
-            style={{ backgroundColor: "#FFBABA", color: "#000" }}
+            className={`w-full h-8 rounded-xl shadow-md flex items-center px-4 py-2 text-sm font-medium 
+              ${getColors(typeSentimenAlert).bgColor} 
+              ${getColors(typeSentimenAlert).textColor}`}
           >
             <span>{sentimentMessage}</span>
           </div>
 
           <div
-            className="w-full h-8 rounded-xl shadow-md flex items-center px-4 py-2 text-sm font-medium"
-            style={{ backgroundColor: "#FFBABA", color: "#000" }}
+            className={`w-full h-8 rounded-xl shadow-md flex items-center px-4 py-2 text-sm font-medium 
+              ${getColors(typeCameraAlert).bgColor} 
+              ${getColors(typeCameraAlert).textColor}`}
           >
             <span>{cameraMessage}</span>
           </div>
