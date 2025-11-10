@@ -1,5 +1,4 @@
 import { CalendarField } from "../general/calendar-field";
-import DateRangeFilter from "../meetings/filters/DateRangeFilter";
 import MemberFilter from "../meetings/filters/MemberFilter";
 import ProjectFilter from "../meetings/filters/ProjectFilter";
 
@@ -20,9 +19,8 @@ export default function OverviewFilters({
         <ProjectFilter
           value={selectedTeam}
           onChange={onTeamChange}
-          projects={["", ...teams]}
+          projects={[...teams]}
           projectNames={{
-            "": "Select a team",
             ...Object.fromEntries(teams.map((team) => [team, team])),
           }}
         />

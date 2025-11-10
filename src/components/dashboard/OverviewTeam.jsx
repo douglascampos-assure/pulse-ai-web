@@ -57,7 +57,7 @@ export default function OverviewTeam({ teamData, performanceData }) {
           />
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-row justify-center items-stretch">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-row justify-center items-stretch gap-4">
           {/* Warnings */}
           <div className="flex flex-col justify-between w-1/2 gap-2 pr-5">
             {teamData.warnings && teamData.warnings.length > 0 ? (
@@ -86,7 +86,9 @@ export default function OverviewTeam({ teamData, performanceData }) {
           </div>
 
           {/* Sentiment */}
-          <SentimentCard averageSentiment={teamData.averageSentiment} />
+          <div className="w-1/2">
+            <SentimentCard averageSentiment={teamData.averageSentiment} />
+          </div>
         </div>
       </div>
     </>
