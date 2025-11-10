@@ -4,11 +4,8 @@ import { useEffect, useState } from "react";
 import { SentimentTrendChart } from "@/src/components/custom/SentimentTrendChart";
 import SkillsOverviewChart from "@/src/components/custom/SkillsOverviewChart";
 import { RecommendedCoursesCards } from "@/src/components/custom/RecommendedCoursesCards";
-import { CalendarField } from "@/src/components/general/calendar-field";
-import { ComboBox } from "@/src/components/general/combobox";
 import { Label } from "@/src/components/ui/label"
 import { Card, CardContent } from "@/src/components/ui/card";
-import { LoaderWrapper } from "@/src/components/general/loader-wrapper";
 
 const FeedbacksPage = () => {
   const [sentimentTrend, setSentimentTrend] = useState(null);
