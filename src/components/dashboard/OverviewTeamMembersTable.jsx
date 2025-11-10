@@ -31,6 +31,8 @@ export default function OverviewTeamMembersTable({
     if (onSelectMember) onSelectMember(name);
   };
 
+  const meetingsValues = [95, 70, 72, 95, 98, 96, 99, 97];
+
   return (
     <div
       className={`bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 ${className}`}
@@ -106,7 +108,7 @@ export default function OverviewTeamMembersTable({
                           compared to the team average.
                         </TooltipContent>
                       </Tooltip>
-                      Slack
+                      Kudos
                     </div>
                     <div className="flex items-center gap-1">
                       <Tooltip>
@@ -142,7 +144,7 @@ export default function OverviewTeamMembersTable({
                           Hours spent in meetings during the analyzed period
                         </TooltipContent>
                       </Tooltip>
-                      Meetings Egagement
+                      Meetings Engagement
                     </div>
                   </div>
                 </div>
@@ -152,7 +154,7 @@ export default function OverviewTeamMembersTable({
           <tbody className="divide-y divide-gray-200">
             {members.map((m, idx) => {
               const participation = getParticipationLevel(m.avgParticipation);
-
+              const meetingsEngagement = meetingsValues[idx] ?? 95;
               return (
                 <tr
                   key={idx}
@@ -241,15 +243,9 @@ export default function OverviewTeamMembersTable({
 
                         {/* 7 Meetings */}
                         <span className="text-slate-800">
-                          {Math.min(
-                            Math.round(
-                              (((Number(m.kudosCount?.toFixed(0)) || 0) * 7) %
-                                91) +
-                                10
-                            ),
-                            100
-                          )}{" "}
-                          %
+                          <span className="text-slate-800">
+                            {meetingsEngagement}%
+                          </span>
                         </span>
                       </div>
                     </div>
