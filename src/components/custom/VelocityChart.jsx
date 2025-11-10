@@ -7,12 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/src/components/ui/card";
-import { Loader } from "lucide-react"; // Asumiendo que usas lucide-react
+import { Loader } from "lucide-react";
 
-// Colores para el gráfico
 const COLORS = {
-  committed: "#B0BEC5", // Gris (Comprometido)
-  completed: "#4CAF50", // Verde (Completado)
+  committed: "#B0BEC5",
+  completed: "#4CAF50",
   track: "#E6EEF3",
 };
 
@@ -25,70 +24,74 @@ export default function VelocityChart({
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // useEffect(() => {
-  //   // No cargar datos si no hay un equipo seleccionado
-  //   if (!team) {
-  //     setData([]);
-  //     return;
-  //   }
+  useEffect(() => {
+    if (!team) {
+      setData([]);
+      return;
+    }
 
-  //   const controller = new AbortController();
-  //   (async () => {
-  //     try {
-  //       setLoading(true);
-  //       const params = new URLSearchParams();
-  //       params.append("team", team);
-  //       if (employee) params.append("employee", employee);
-  //       if (startDate) params.append("startDate", startDate);
-  //       if (endDate) params.append("endDate", endDate);
+    const controller = new AbortController();
+    (async () => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams();
+        params.append("team", team);
+        if (employee) params.append("employee", employee);
+        if (startDate) params.append("startDate", startDate);
+        if (endDate) params.append("endDate", endDate);
 
-  //       // 2. Llamar a la nueva API de Velocity
-  //       const res = await fetch(`/api/charts/jira-velocity?${params.toString()}`, { signal: controller.signal });
+        const res = await fetch(`/api/charts/jira-velocity?${params.toString()}`, { signal: controller.signal });
 
-  //       if (!res.ok) throw new Error("Failed to fetch data");
+        if (!res.ok) throw new Error("Failed to fetch data");
 
-  //       const json = await res.json();
-  //       setData(Array.isArray(json) ? json : []);
-  //     } catch (err) {
-  //       if (err.name !== "AbortError") console.error("Error loading velocity data:", err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   })();
+        const json = await res.json();
+        setData(Array.isArray(json) ? json : []);
+      } catch (err) {
+        if (err.name !== "AbortError") console.error("Error loading velocity data:", err);
+      } finally {
+        setLoading(false);
+      }
+    })();
 
-  //   return () => controller.abort();
-  // }, [team, employee, startDate, endDate]);
+    return () => controller.abort();
+  }, [team, employee, startDate, endDate]);
 
   useEffect(() => {
     if (!team | (team == null)) {
       setData([]);
       return;
     }
+    const controller = new AbortController();
+    (async () => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams();
+        params.append("team", team);
+        if (employee) params.append("employee", employee);
+        if (startDate) params.append("startDate", startDate);
+        if (endDate) params.append("endDate", endDate);
 
-    // DATA QUEMADA
-    const fakeData = [
-      { name: "Sprint 1", committed: 10, completed: 8 },
-      { name: "Sprint 2", committed: 12, completed: 12 },
-      { name: "Sprint 3", committed: 15, completed: 10 },
-      { name: "Sprint 4", committed: 8, completed: 8 },
-    ];
-
-    // Simular carga
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setData(fakeData);
-      setLoading(false);
-    }, 500); // medio segundo de simulación
-
-    return () => clearTimeout(timer);
-  }, [team]);
+        const res = await fetch(`/api/charts/jira-velocity?${params.toString()}`, { signal: controller.signal });
+        
+        if (!res.ok) throw new Error("Failed to fetch data");
+        
+        const json = await res.json();
+        setData(Array.isArray(json) ? json : []);
+      } catch (err) {
+        if (err.name !== "AbortError") console.error("Error loading velocity data:", err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+    
+    return () => controller.abort();
+  }, [team, employee, startDate, endDate]);
 
   const { hasStoryPoints, maxPoints } = useMemo(() => {
     if (!data || data.length === 0) {
       return { hasStoryPoints: false, maxPoints: 1 };
     }
 
-    // 3. Comprobar si se están usando Story Points (AC)
     const totalPoints = data.reduce((acc, sprint) => {
       return acc + (sprint.committed || 0) + (sprint.completed || 0);
     }, 0);
@@ -101,7 +104,6 @@ export default function VelocityChart({
     return { hasStoryPoints: totalPoints > 0, maxPoints: maxVal };
   }, [data]);
 
-  // Estados de carga y vacíos
   if (loading) {
     return (
       <Card className="min-h-[300px] flex justify-center items-center">
@@ -120,7 +122,6 @@ export default function VelocityChart({
     );
   }
 
-  // 4. Ocultar el gráfico si no hay Story Points (AC)
   if (!hasStoryPoints) {
     return (
       <Card className="min-h-[300px] flex justify-center items-center">
@@ -131,7 +132,6 @@ export default function VelocityChart({
     );
   }
 
-  // Renderizar el gráfico
   return (
     <Card>
       <CardHeader>
@@ -200,7 +200,6 @@ export default function VelocityChart({
   );
 }
 
-// Componente de Leyenda (igual que el tuyo)
 function Legend({ color, label }) {
   return (
     <div className="flex items-center space-x-2 text-sm text-gray-600">
