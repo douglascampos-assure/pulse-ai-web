@@ -84,6 +84,21 @@ export default function MeetingParticipantsTable({
   };
 
   /**
+   * Get role badge configuration
+   * @param {string} role - The role of the participant
+   * @returns {Object} Badge configuration
+   */
+  const getRoleBadge = (role) => {
+    const roles = {
+      "Project Manager": { label: "PM", color: "bg-blue-50 text-blue-700 border-blue-200" },
+      "Product Owner": { label: "PO", color: "bg-purple-50 text-purple-700 border-purple-200" },
+      "Team member": { label: "Dev", color: "bg-slate-50 text-slate-700 border-slate-200" },
+      "Unknown": { label: "—", color: "bg-gray-50 text-gray-500 border-gray-200" },
+    };
+    return roles[role] || roles["Unknown"];
+  };
+
+  /**
    * Handle row click
    * @param {string} participantName - Name of the participant
    */
@@ -131,6 +146,7 @@ export default function MeetingParticipantsTable({
           <thead className="bg-slate-50">
             <tr>
               <th className="px-3 py-2 text-left font-semibold text-slate-700 uppercase">Participant</th>
+              <th className="px-3 py-2 text-left font-semibold text-slate-700 uppercase">Role</th>
               <th className="px-3 py-2 text-left font-semibold text-slate-700 uppercase">Camera</th>
               <th className="px-3 py-2 text-left font-semibold text-slate-700 uppercase">Participation</th>
               <th className="px-3 py-2 text-left font-semibold text-slate-700 uppercase">Interventions</th>
@@ -140,9 +156,10 @@ export default function MeetingParticipantsTable({
           </thead>
           <tbody className="divide-y divide-gray-200">
             {participants.map((participant, index) => {
-              const qualityColor = getScoreColor(participant.contribution_quality_score, "quality");
+              const qualityColor = getScoreColor(participant.contextual_quality_score, "quality");
               const participation = getParticipationLevel(participant.speech_percentage);
               const contributionBadge = getContributionTypeBadge(participant.contribution_type);
+              const roleBadge = getRoleBadge(participant.role);
 
               return (
                 <tr 
@@ -165,6 +182,13 @@ export default function MeetingParticipantsTable({
                       </div>
                       <p className="font-semibold text-slate-800">{participant.participant_name}</p>
                     </div>
+                  </td>
+
+                  {/* Role Badge */}
+                  <td className="px-3 py-2">
+                    <span className={`inline-block px-2 py-0.5 rounded border ${roleBadge.color} font-medium text-xs`}>
+                      {roleBadge.label}
+                    </span>
                   </td>
                   
                   {/* Camera Usage */}
@@ -203,7 +227,7 @@ export default function MeetingParticipantsTable({
                       <span className={`inline-block px-2 py-0.5 rounded border ${qualityColor.lightBg} ${qualityColor.text} ${qualityColor.border} font-semibold`}>
                         {qualityColor.label}
                       </span>
-                      <span className="font-bold text-slate-800">{participant.contribution_quality_score}/10</span>
+                      <span className="font-bold text-slate-800">{participant.contextual_quality_score}/10</span>
                     </div>
                   </td>
                 </tr>
@@ -229,9 +253,10 @@ export default function MeetingParticipantsTable({
  * 
  * @typedef {Object} Participant
  * @property {string} participant_name - Participant name
+ * @property {string} role - Participant role (Project Manager, Product Owner, Team member, Unknown)
  * @property {number} camera_on_percentage - Camera on percentage (0-100)
  * @property {number} speech_percentage - Speech/participation percentage (0-100)
  * @property {number} total_utterances - Number of interventions
  * @property {string} contribution_type - Type of contribution (proposal, report, question, discussion)
- * @property {number} contribution_quality_score - Quality score (0-10)
+ * @property {number} contextual_quality_score - Contextual quality score (0-10)
  */

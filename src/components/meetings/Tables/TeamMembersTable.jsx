@@ -33,17 +33,24 @@ export default function TeamMembersTable({
    */
   const getScoreColor = (score, type = "quality") => {
     if (type === "quality") {
-      if (score >= 8) return { 
+      if (score >= 7.0) return { 
         bg: "bg-emerald-500", 
         text: "text-emerald-700", 
         label: "Excellent", 
         lightBg: "bg-emerald-50", 
         border: "border-emerald-300" 
       };
-      if (score >= 6) return { 
-        bg: "bg-amber-500", 
-        text: "text-amber-700", 
+      if (score >= 6.3) return { 
+        bg: "bg-lime-400", 
+        text: "text-lime-700", 
         label: "Good", 
+        lightBg: "bg-lime-50", 
+        border: "border-lime-300" 
+      };
+      if (score >= 4.0) return { 
+        bg: "bg-amber-400", 
+        text: "text-amber-700", 
+        label: "Regular", 
         lightBg: "bg-amber-50", 
         border: "border-amber-300" 
       };
@@ -55,13 +62,39 @@ export default function TeamMembersTable({
         border: "border-rose-300" 
       };
     }
-    
+
     if (type === "percentage") {
-      if (score >= 70) return { bg: "bg-emerald-500" };
-      if (score >= 50) return { bg: "bg-amber-500" };
-      return { bg: "bg-rose-500" };
+      if (score >= 80) return { 
+        bg: "bg-emerald-500", 
+        text: "text-emerald-700", 
+        label: "Excellent", 
+        lightBg: "bg-emerald-50", 
+        border: "border-emerald-300" 
+      };
+      if (score >= 65) return { 
+        bg: "bg-lime-400", 
+        text: "text-lime-700", 
+        label: "Good", 
+        lightBg: "bg-lime-50", 
+        border: "border-lime-300" 
+      };
+      if (score >= 45) return { 
+        bg: "bg-amber-400", 
+        text: "text-amber-700", 
+        label: "Regular", 
+        lightBg: "bg-amber-50", 
+        border: "border-amber-300" 
+      };
+      return { 
+        bg: "bg-rose-500", 
+        text: "text-rose-700", 
+        label: "Needs Improvement", 
+        lightBg: "bg-rose-50", 
+        border: "border-rose-300" 
+      };
     }
   };
+
 
   /**
    * Get badge configuration for contribution types
@@ -87,6 +120,21 @@ export default function TeamMembersTable({
     if (percentage >= 20) return { color: "bg-emerald-500" };
     if (percentage >= 10) return { color: "bg-amber-500" };
     return { color: "bg-rose-500" };
+  };
+
+  /**
+   * Get role badge configuration
+   * @param {string} role - The role of the participant
+   * @returns {Object} Badge configuration
+   */
+  const getRoleBadge = (role) => {
+    const roles = {
+      "Project Manager": { label: "PM", color: "bg-blue-50 text-blue-700 border-blue-200" },
+      "Product Owner": { label: "PO", color: "bg-purple-50 text-purple-700 border-purple-200" },
+      "Team member": { label: "Dev", color: "bg-slate-50 text-slate-700 border-slate-200" },
+      "Unknown": { label: "—", color: "bg-gray-50 text-gray-500 border-gray-200" },
+    };
+    return roles[role] || roles["Unknown"];
   };
 
   /**
@@ -155,6 +203,7 @@ export default function TeamMembersTable({
           <thead className="bg-slate-50">
             <tr>
               <th className="px-3 py-2 text-left font-semibold text-slate-700 uppercase">Member</th>
+              <th className="px-3 py-2 text-left font-semibold text-slate-700 uppercase">Role</th>
               <th className="px-3 py-2 text-left font-semibold text-slate-700 uppercase">Sessions</th>
               <th className="px-3 py-2 text-left font-semibold text-slate-700 uppercase">Participation</th>
               <th className="px-3 py-2 text-left font-semibold text-slate-700 uppercase">Camera</th>
@@ -168,6 +217,7 @@ export default function TeamMembersTable({
               const qualityColor = getScoreColor(parseFloat(member.avgQuality), "quality");
               const participation = getParticipationLevel(parseFloat(member.avgParticipation));
               const contributionBadge = getContributionTypeBadge(member.mostCommonType);
+              const roleBadge = getRoleBadge(member.role);
 
               return (
                 <tr 
@@ -190,6 +240,13 @@ export default function TeamMembersTable({
                       </div>
                       <p className="font-semibold text-slate-800">{member.name}</p>
                     </div>
+                  </td>
+
+                  {/* Role Badge */}
+                  <td className="px-3 py-2">
+                    <span className={`inline-block px-2 py-0.5 rounded border ${roleBadge.color} font-medium text-xs`}>
+                      {roleBadge.label}
+                    </span>
                   </td>
                   
                   {/* Number of Sessions */}
@@ -262,10 +319,11 @@ export default function TeamMembersTable({
  * 
  * @typedef {Object} Member
  * @property {string} name - Member name
+ * @property {string} role - Member role (Project Manager, Product Owner, Team member, Unknown)
  * @property {number} meetings - Number of meetings attended
  * @property {string} avgParticipation - Average participation percentage
  * @property {string} avgCamera - Average camera on percentage
  * @property {string} avgInterventions - Average number of interventions
- * @property {string} avgQuality - Average quality score
+ * @property {string} avgQuality - Average contextual quality score
  * @property {string} mostCommonType - Most common contribution type
  */
