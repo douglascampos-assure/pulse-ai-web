@@ -126,6 +126,7 @@ const JiraDashboardPage = () => {
       </Card>
   
       {selectedTeam ? (
+        <>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
           <VelocityChart
             team={selectedTeam}
@@ -140,14 +141,17 @@ const JiraDashboardPage = () => {
             endDate={endDate}
             periodicity={periodicity}
           />
-          <CycleTimeChart 
-            team={selectedTeam}
-            employee={selectedEmployee}
-            startDate={startDate}
-            endDate={endDate}
-            periodicity={periodicity}
-          />
         </div>
+        <div className="col-span-full">
+            <CycleTimeChart 
+              team={selectedTeam}
+              employee={selectedEmployee}
+              startDate={startDate}
+              endDate={endDate}
+              periodicity={periodicity}
+            />
+        </div>
+        </>
       ) : (
         <div className="flex justify-center items-center h-[400px] border-2 border-dashed rounded-lg bg-gray-50 text-gray-500">
           <p>Please select a team to view the charts.</p>
