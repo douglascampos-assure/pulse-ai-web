@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Pulse AI",
+  title: "Communication AI",
   description: "Admin panel",
 };
 

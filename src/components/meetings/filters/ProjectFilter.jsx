@@ -11,7 +11,7 @@
  *   onChange={handleProjectChange}
  *   projects={['mdp-aftd-phf', 'aty-qrdo-sbz']}
  *   projectNames={{
- *     'mdp-aftd-phf': 'Pulse AI',
+ *     'mdp-aftd-phf': 'Communication AI',
  *     'aty-qrdo-sbz': 'Recruitment AI'
  *   }}
  * />

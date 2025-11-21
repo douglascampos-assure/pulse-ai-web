@@ -47,7 +47,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (teams && teams.length > 0 && !selectedTeam) {
-      const defaultTeam = "Pulse ai"; // o teams[0]
+      const defaultTeam = "Communication ai"; // o teams[0]
       setSelectedTeam(defaultTeam);
       loadTeamData(defaultTeam);
     }
@@ -64,10 +64,10 @@ export default function DashboardPage() {
   let sentimentMessage = "Select a team";
   let cameraMessage = "Select a team";
 
-  if (selectedTeam === "Pulse ai") {
+  if (selectedTeam === "Communication ai") {
     sentimentMessage =
-      "1 team member in Pulse ai shows mostly negative feedback.";
-    cameraMessage = "2 members of Pulse ai show low camera usage in meetings.";
+      "1 team member in Communication ai shows mostly negative feedback.";
+    cameraMessage = "2 members of Communication ai show low camera usage in meetings.";
   }
   return (
     <div className="p-6 flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900  w-full space-y-6">

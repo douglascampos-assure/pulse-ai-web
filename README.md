@@ -1,4 +1,4 @@
-# pulse-ai-web
+# communication-ai-web
 
 ## Getting Started
 
