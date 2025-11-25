@@ -15,7 +15,7 @@
  * - AI-powered insights and recommendations
  * - Date range filtering with dropdowns
  * 
- * Author: Pulse AI
+ * Author: Communication AI
  * Last Updated: October 2025
  * ============================================================================
  */
@@ -71,6 +71,7 @@ export default function MeetingsPage() {
   
   const projectNames = {
     'mdp-aftd-phf': 'Pulse AI',
+     'mdp-aftd-phf': 'Communication AI',
     'aty-qrdo-sbz': 'Recruitment AI'
   };
 

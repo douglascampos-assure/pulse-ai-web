@@ -219,12 +219,12 @@ export async function GET(req) {
       warnings: [
         {
           message:
-            "Emilio Espinoza in Team Pulse AI has a predominant negative feedback.",
+            "Emilio Espinoza in Team Communication AI has a predominant negative feedback.",
           type: "negative",
         },
         {
           message:
-            "Alvaro Mercado, Roger Garcia in Team Pulse AI are having less than 85% camera engagement in the meetings.",
+            "Alvaro Mercado, Roger Garcia in Team Communication AI are having less than 85% camera engagement in the meetings.",
           type: "alert",
         },
       ],
