@@ -7,16 +7,16 @@ export async function GET(req) {
     const schema = "gold";
 
     const sql = `
-      SELECT DISTINCT Team
-      FROM ${catalog}.${schema}.feedback_enriched
-      WHERE Team IS NOT NULL
-      ORDER BY Team ASC
+      SELECT DISTINCT team
+      FROM ${catalog}.${schema}.google_sheets_feedback
+      WHERE team IS NOT NULL
+      ORDER BY team ASC
     `;
 
     const result = await queryDatabricks(sql);
     
     console.log("Teams result:", result);
-    const teams = result.map(row => row.Team);
+    const teams = result.map(row => row.team);
 
     return NextResponse.json(teams);
   } catch (error) {

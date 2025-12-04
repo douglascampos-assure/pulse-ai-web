@@ -13,23 +13,23 @@ export async function GET(req) {
     const schema = "gold";
 
     let whereClauses = [];
-    whereClauses.push("feedback_date IS NOT NULL");
-    whereClauses.push("Sentiment IS NOT NULL");
+    whereClauses.push("feedbackDate IS NOT NULL");
+    whereClauses.push("sentiment IS NOT NULL");
 
-    if (team) whereClauses.push(`Team = '${team}'`);
-    if (employee) whereClauses.push(`employee_id = '${employee}'`);
-    if (startDate) whereClauses.push(`feedback_date >= '${startDate}'`);
-    if (endDate) whereClauses.push(`feedback_date <= '${endDate}'`);
+    if (team) whereClauses.push(`team = '${team}'`);
+    if (employee) whereClauses.push(`employeeId = '${employee}'`);
+    if (startDate) whereClauses.push(`feedbackDate >= '${startDate}'`);
+    if (endDate) whereClauses.push(`feedbackDate <= '${endDate}'`);
 
     const whereSQL = `WHERE ${whereClauses.join(" AND ")}`;
 
     const sql = `
       SELECT
-        DATE_FORMAT(feedback_date, 'yyyy-MM') AS date, -- Agrupar por Mes/Año
-        SUM(CASE WHEN Sentiment = 'Positive' THEN 1 ELSE 0 END) AS Positive,
-        SUM(CASE WHEN Sentiment = 'Negative' THEN 1 ELSE 0 END) AS Negative,
-        SUM(CASE WHEN Sentiment = 'Neutral' THEN 1 ELSE 0 END) AS Neutral
-      FROM ${catalog}.${schema}.feedback_enriched
+        DATE_FORMAT(feedbackDate, 'yyyy-MM') AS date, -- Agrupar por Mes/Año
+        SUM(CASE WHEN sentiment = 'Positive' THEN 1 ELSE 0 END) AS Positive,
+        SUM(CASE WHEN sentiment = 'Negative' THEN 1 ELSE 0 END) AS Negative,
+        SUM(CASE WHEN sentiment = 'Neutral' THEN 1 ELSE 0 END) AS Neutral
+      FROM ${catalog}.${schema}.google_sheets_feedback
       ${whereSQL}
       GROUP BY 1
       ORDER BY 1 ASC

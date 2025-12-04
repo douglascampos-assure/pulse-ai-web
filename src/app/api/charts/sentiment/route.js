@@ -43,7 +43,7 @@ export async function GET(req) {
         SUM(CASE WHEN Sentiment = 'Positive' THEN 1 ELSE 0 END) AS Positive,
         SUM(CASE WHEN Sentiment = 'Negative' THEN 1 ELSE 0 END) AS Negative,
         SUM(CASE WHEN Sentiment = 'Neutral' THEN 1 ELSE 0 END) AS Neutral
-      FROM ${catalog}.${schema}.feedback_enriched
+      FROM ${catalog}.${schema}.google_sheets_feedback
       ${baseWhere}
       GROUP BY feedback_date
       ORDER BY feedback_date ASC
@@ -66,7 +66,7 @@ export async function GET(req) {
           SUM(CASE WHEN Sentiment = 'Positive' THEN 1 ELSE 0 END) AS Positive,
           SUM(CASE WHEN Sentiment = 'Negative' THEN 1 ELSE 0 END) AS Negative,
           SUM(CASE WHEN Sentiment = 'Neutral' THEN 1 ELSE 0 END) AS Neutral
-        FROM ${catalog}.${schema}.feedback_enriched
+        FROM ${catalog}.${schema}.google_sheets_feedback
         ${baseWhere} AND employee_id = '${employee.replace(/'/g, "''")}'
         GROUP BY feedback_date
         ORDER BY feedback_date ASC
