@@ -10,22 +10,22 @@ export async function GET(req) {
     const catalog = process.env.DATABRICKS_CATALOG;
     const schema = "gold";
 
-    let whereClauses = [`COALESCE(TRIM(Recommended_Course), '') <> ''`];
-    if (team) whereClauses.push(`Team = '${team}'`);
-    if (employee) whereClauses.push(`employee_id = '${employee}'`);
+    let whereClauses = [`COALESCE(TRIM(recommendedCourse), '') <> ''`];
+    if (team) whereClauses.push(`team = '${team}'`);
+    if (employee) whereClauses.push(`employeeId = '${employee}'`);
     const limit = searchParams.get("limit") || 4;
 
     const whereSQL = whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
 
     const sql = `
       SELECT
-          Recommended_Course,
+          recommendedCourse,
           COUNT(*) AS times_recommended, 
-          AVG(Match_Score) AS avg_score,
-          COLLECT_SET(Skill_to_Improve) AS Skills_Improved_List 
-      FROM ${catalog}.${schema}.feedback_enriched
+          AVG(matchScore) AS avg_score,
+          COLLECT_SET(skillToImprove) AS Skills_Improved_List 
+      FROM ${catalog}.${schema}.google_sheets_feedback
       ${whereSQL}
-      GROUP BY Recommended_Course
+      GROUP BY recommendedCourse
       HAVING COUNT(*) > 0
       ORDER BY times_recommended DESC
       LIMIT ${limit}

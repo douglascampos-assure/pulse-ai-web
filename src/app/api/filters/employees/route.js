@@ -9,25 +9,25 @@ export async function GET(req) {
     const catalog = process.env.DATABRICKS_CATALOG;
     const schema = "gold";
 
-    let whereClauses = ["Employee_Id IS NOT NULL", "Employee IS NOT NULL"];
+    let whereClauses = ["employeeId IS NOT NULL", "employee IS NOT NULL"];
     if (team) {
-      whereClauses.push(`Team = '${team}'`);
+      whereClauses.push(`team = '${team}'`);
     }
 
     const whereSQL = `WHERE ${whereClauses.join(" AND ")}`;
 
     const sql = `
-      SELECT DISTINCT Employee_Id, Employee
-      FROM ${catalog}.${schema}.feedback_enriched
+      SELECT DISTINCT employeeId, employee
+      FROM ${catalog}.${schema}.google_sheets_feedback
       ${whereSQL}
-      ORDER BY Employee ASC
+      ORDER BY employee ASC
     `;
 
     const result = await queryDatabricks(sql);
 
     const employees = result.map(row => ({
-      id: row.Employee_Id,
-      displayName: row.Employee
+      id: row.employeeId,
+      displayName: row.employee
     }));
     console.log("Fetched employees:", employees);
     return NextResponse.json(employees);

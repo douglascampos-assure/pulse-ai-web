@@ -134,7 +134,7 @@ export async function GET(req) {
     // 5️⃣ Sentiment (feedback)
     const sentimentResult = await queryDatabricks(`
       SELECT Email AS work_email, Sentiment
-      FROM ${catalog}.${schema_gold}.feedback_enriched
+      FROM ${catalog}.${schema_gold}.google_sheets_feedback
       WHERE Email IN (${emailsList})
         AND Sentiment IS NOT NULL
     `);
