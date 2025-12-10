@@ -510,7 +510,8 @@ export default function MeetingsPage() {
       if (!memberStats[p.participant_name]) {
         memberStats[p.participant_name] = {
           name: p.participant_name,
-          role: p.role, // 🆕 AGREGAR ESTA LÍNEA
+          department: p.department || "N/A",
+          jobTitle: p.job_title || "N/A",
           meetings: 0,
           totalParticipation: 0,
           totalCamera: 0,
@@ -523,13 +524,14 @@ export default function MeetingsPage() {
       memberStats[p.participant_name].totalParticipation += p.speech_percentage;
       memberStats[p.participant_name].totalCamera += p.camera_on_percentage;
       memberStats[p.participant_name].totalInterventions += p.total_utterances;
-      memberStats[p.participant_name].totalQuality += p.contextual_quality_score; // Ya cambiaste esto
+      memberStats[p.participant_name].totalQuality += p.contextual_quality_score;
       memberStats[p.participant_name].contributionTypes.push(p.contribution_type);
     });
 
     return Object.values(memberStats).map(m => ({
       name: m.name,
-      role: m.role, // 🆕 AGREGAR ESTA LÍNEA TAMBIÉN
+      department: m.department,
+      jobTitle: m.jobTitle,
       meetings: m.meetings,
       avgParticipation: (m.totalParticipation / m.meetings).toFixed(1),
       avgCamera: (m.totalCamera / m.meetings).toFixed(0),
