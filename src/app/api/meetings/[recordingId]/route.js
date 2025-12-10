@@ -3,43 +3,46 @@ import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
   try {
-    // Fix Next.js 15 - await params
     const { recordingId } = await params;
     
     const sql = `
-      WITH deduplicated_sentiment AS (
-        SELECT 
-          *,
-          ROW_NUMBER() OVER (
-            PARTITION BY recording_id, participant_name 
-            ORDER BY created_at DESC
-          ) as rn
-        FROM workspace.gold.recallai_meeting_sentiment_analysis
-      )
       SELECT 
-        m.participant_name,
-        m.role,
-        m.job_title,
-        m.speech_percentage,
-        m.camera_on_percentage,
-        m.total_utterances,
-        m.total_speech_time_seconds,
-        m.interruption_count,
+        -- Basic Info
+        m.participantName as participant_name,
+        m.participantEmail as participant_email,
+        COALESCE(m.displayName, m.participantName) as display_name,
+        m.department,
+        m.jobTitle as job_title,
+        m.employeeTeam as employee_team,
+        m.lead,
+        
+        -- Participation Metrics
+        m.speechPercentage as speech_percentage,
+        m.cameraOnPercentage as camera_on_percentage,
+        m.totalUtterances as total_utterances,
+        m.totalSpeechTimeSeconds as total_speech_time_seconds,
+        m.avgUtteranceDuration as avg_utterance_duration,
+        m.totalWords as total_words,
+        m.avgWordsPerUtterance as avg_words_per_utterance,
+        m.interruptionCount as interruption_count,
+        
+        -- Sentiment & Quality (from LLM analysis)
         s.sentiment,
-        s.contribution_quality_score,
-        s.contextual_quality_score,
-        s.expectations_met,
-        s.reasoning,
-        s.contribution_type,
-        s.key_topics,
-        s.action_items
-      FROM workspace.gold.recallai_participant_metrics m
-      JOIN deduplicated_sentiment s
-        ON m.recording_id = s.recording_id 
-        AND m.participant_name = s.participant_name
-        AND s.rn = 1
-      WHERE m.recording_id = '${recordingId}'
-      ORDER BY m.speech_percentage DESC
+        s.sentimentScore as sentiment_score,
+        s.contributionQualityScore as contextual_quality_score,
+        s.contributionType as contribution_type,
+        s.keyTopics as key_topics,
+        s.actionItems as action_items,
+        s.questionsRaised as questions_raised
+        
+      FROM gold.meetings_participant_metrics m
+      
+      LEFT JOIN gold.meetings_sentiment_analysis s
+        ON m.recordingId = s.recordingId 
+        AND m.participantName = s.participantName
+        
+      WHERE m.recordingId = '${recordingId}'
+      ORDER BY m.speechPercentage DESC
     `;
     
     const data = await queryDatabricks(sql);

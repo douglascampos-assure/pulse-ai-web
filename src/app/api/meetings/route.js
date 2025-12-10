@@ -4,16 +4,21 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const sql = `
-      SELECT DISTINCT
-        meeting_id,
-        recording_id,
-        meeting_date,
-        COUNT(DISTINCT participant_name) as total_participants,
-        ROUND(AVG(speech_percentage), 2) as avg_speech,
-        ROUND(AVG(camera_on_percentage), 2) as avg_camera
-      FROM workspace.gold.recallai_participant_metrics
-      GROUP BY meeting_id, recording_id, meeting_date
-      ORDER BY meeting_date DESC
+      SELECT 
+        m.meetingId as meeting_id,
+        m.recordingId as recording_id,
+        m.meetingDate as meeting_date,
+        COUNT(DISTINCT m.participantName) as total_participants,
+        ROUND(AVG(m.speechPercentage), 2) as avg_speech,
+        ROUND(AVG(m.cameraOnPercentage), 2) as avg_camera,
+        ROUND(AVG(m.totalWords), 2) as avg_words,
+        ROUND(AVG(s.contributionQualityScore), 2) as avg_contribution_quality
+      FROM gold.meetings_participant_metrics m
+      LEFT JOIN gold.meetings_sentiment_analysis s
+        ON m.recordingId = s.recordingId 
+        AND m.participantName = s.participantName
+      GROUP BY m.meetingId, m.recordingId, m.meetingDate
+      ORDER BY m.meetingDate DESC
     `;
     
     const data = await queryDatabricks(sql);
@@ -26,4 +31,3 @@ export async function GET() {
     );
   }
 }
-
