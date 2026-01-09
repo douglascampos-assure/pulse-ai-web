@@ -3,6 +3,9 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
+    const catalog = process.env.DATABRICKS_CATALOG;
+    const schema = process.env.DATABRICKS_SCHEMA_GOLD;
+    
     const sql = `
       SELECT DISTINCT
         meeting_id,
@@ -11,7 +14,7 @@ export async function GET() {
         COUNT(DISTINCT participant_name) as total_participants,
         ROUND(AVG(speech_percentage), 2) as avg_speech,
         ROUND(AVG(camera_on_percentage), 2) as avg_camera
-      FROM workspace.gold.recallai_participant_metrics
+      FROM ${catalog}.${schema}.recallai_participant_metrics
       GROUP BY meeting_id, recording_id, meeting_date
       ORDER BY meeting_date DESC
     `;
@@ -26,4 +29,3 @@ export async function GET() {
     );
   }
 }
-

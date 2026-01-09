@@ -1,8 +1,29 @@
 import { queryDatabricks } from "@/src/lib/databricks";
+import { getUserRole } from "@/src/lib/userRoles";
 import { NextResponse } from "next/server";
+import { jwtVerify } from "jose";
+
+const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function GET(req) {
   try {
+    // 1. Get user from JWT
+    const session = req.cookies.get("session")?.value;
+    
+    if (!session) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
+
+    const { payload } = await jwtVerify(session, secret);
+    const userEmail = payload.email;
+
+    // 2. Get user role
+    const userRole = await getUserRole(userEmail);
+    
+    if (!userRole) {
+      return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+    }
+
     const { searchParams } = new URL(req.url);
     const teamName = searchParams.get("team");
 
@@ -19,15 +40,27 @@ export async function GET(req) {
     const schema = process.env.DATABRICKS_SCHEMA_BRONZE;
     const schema_gold = process.env.DATABRICKS_SCHEMA_GOLD;
 
-    // 1️⃣ Miembros del equipo
+    // 3. Build role-based filter for employees query
+    let departmentFilter = "";
+    if (userRole.role === 'ADMIN') {
+      // ADMIN sees only their department
+      departmentFilter = `AND Department = '${userRole.department}'`;
+    }
+    // ENGINEERING_ADMIN sees all (no filter)
+
+    // 1️⃣ Miembros del equipo (with role filtering)
     const membersResult = await queryDatabricks(`
       SELECT WorkEmail, FirstName, LastName, Department, Lead, Role
       FROM ${catalog}.${schema}.google_sheets_employees
       WHERE Team = '${teamName}'
         AND WorkEmail IS NOT NULL
+        ${departmentFilter}
     `);
 
     const members = membersResult || [];
+    
+    console.log(`[ROLES] User: ${userEmail}, Role: ${userRole.role}, Team: ${teamName}, Members returned: ${members.length}`);
+    
     const emails = members.map((m) => m.WorkEmail);
     if (emails.length === 0) {
       return NextResponse.json({ members: [], performance: {} });

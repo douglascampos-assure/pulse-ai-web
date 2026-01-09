@@ -1,4 +1,5 @@
 import { queryDatabricks } from "@/src/lib/databricks";
+import { getUserRole } from "@/src/lib/userRoles";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { SignJWT } from "jose";
@@ -40,12 +41,22 @@ export async function POST(req) {
       );
     }
 
-    const passwordMatch = password === user.password; //await bcrypt.compare(password, user.password);
+    const passwordMatch = password === user.password;
 
     if (!passwordMatch) {
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 }
+      );
+    }
+
+    // NEW: Check if user is in whitelist (user_roles table)
+    const userRole = await getUserRole(email);
+    
+    if (!userRole) {
+      return NextResponse.json(
+        { error: "Your email is not authorized to access this application" },
+        { status: 403 }
       );
     }
 
@@ -55,6 +66,10 @@ export async function POST(req) {
       email: user.user_email,
       userId: user.id,
       type: user.type,
+      // NEW: Include role information in JWT
+      role: userRole.role,
+      division: userRole.division,
+      department: userRole.department,
     })
       .setProtectedHeader({ alg })
       .setExpirationTime("2h")
